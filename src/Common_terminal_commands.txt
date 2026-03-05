@@ -1,0 +1,73 @@
+
+-- For å launche simulator fra Home directory: --
+
+gz sim ./BOT_jetty/building_robot.sdf
+
+
+
+-- For å launche simulator fra workspace directory: --
+
+gz sim building_robot.sdf
+
+
+
+
+
+
+-- ROS2 --
+
+
+-- For å kjøre ROS2: --
+
+colcon build
+source install/setup.bash
+ros2 run sondre_bot_control vision_drive
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Terminal 1: Gazebo
+cd ~/sondre_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="src/sondre_bot_sim/worlds/building_robot.sdf"
+
+
+
+
+# Terminal 2: Bridge
+cd ~/sondre_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 run ros_gz_bridge parameter_bridge \
+  /camera/image_raw@sensor_msgs/msg/Image@gz.msgs.Image \
+  /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
+
+
+
+ELLER
+ros2 run ros_gz_bridge parameter_bridge \
+  /camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image \
+  /cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist
+
+
+
+  # Terminal 3: Your node
+cd ~/sondre_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 run sondre_bot_control vision_drive
+
+
+
+#Verifying that the bridge is working
+ros2 topic hz /camera/image_raw
