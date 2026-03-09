@@ -108,3 +108,21 @@ ros2 run ros_gz_bridge parameter_bridge /camera/left/image_raw@sensor_msgs/msg/I
 
 
 
+
+-------------------------------------------------------------------------------
+# Update github repo
+
+cd ~/sondre_ws
+
+git status
+git add .
+git commit -m "Update Eurobot Gazebo project"
+git branch -M main
+
+git remote remove origin 2>/dev/null
+git remote add origin git@github.com:Sondrewiig/sondre_bot_gz.git
+
+git pull origin main --allow-unrelated-histories
+git push -u origin main
+
+-------------------------------------------------------------------------------

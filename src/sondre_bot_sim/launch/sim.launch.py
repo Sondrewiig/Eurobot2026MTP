@@ -37,8 +37,10 @@ def generate_launch_description():
             "/camera/right/image_raw@sensor_msgs/msg/Image@gz.msgs.Image",
             "/camera/left/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo",
             "/camera/right/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo",
+            "/imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
             "/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist",
             "/world/Eurobot_world/dynamic_pose/info@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V",
+            "/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry",
         ],
         output="screen",
     )
@@ -88,6 +90,12 @@ def generate_launch_description():
     output="screen",
     parameters=[{"use_sim_time": True}],
     )
+    
+    pose_fuser = Node(
+        package="sondre_bot_control",
+        executable="pose_fuser",
+        output="screen",
+    )
 
     ground_truth = Node(
         package="sondre_bot_control",
@@ -95,6 +103,13 @@ def generate_launch_description():
         output="screen",
         parameters=[{"use_sim_time": True}],
     )
+    
+    drive_mode_mux = Node(
+    package='sondre_bot_control',
+    executable='drive_mode_mux',
+    name='drive_mode_mux',
+    output='screen',
+)
 
     return LaunchDescription([
         gazebo,
@@ -103,5 +118,7 @@ def generate_launch_description():
         vision,
         apriltag,
         tag_localization,
+        pose_fuser,
         ground_truth,
+        drive_mode_mux,
     ])

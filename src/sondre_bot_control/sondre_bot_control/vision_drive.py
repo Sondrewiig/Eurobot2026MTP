@@ -44,7 +44,7 @@ class VisionDrive(Node):
 
         self.cmd_pub = self.create_publisher(
             Twist,
-            '/cmd_vel',
+            '/cmd_vel_auto',
             10
         )
 

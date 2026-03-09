@@ -7,6 +7,7 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import Image, CameraInfo
 from geometry_msgs.msg import Pose2D
+from std_msgs.msg import Int32MultiArray, String
 
 
 ARUCO_DICTS = {
@@ -97,8 +98,22 @@ class TagLocalization(Node):
         # x,y in meters
         # yaw is tag orientation in field frame
         self.marker_map = {
-            20: {"x": 0.600, "y": 1.400, "yaw": 0},
+            20: {"x": 0.600, "y": 1.400, "yaw": 0.0},  # Yellow_close
+            21: {"x": 2.400, "y": 1.400, "yaw": 0.0},  # Blue_close
+            22: {"x": 0.600, "y": 0.600, "yaw": 0.0},  # Yellow_far
+            23: {"x": 2.400, "y": 0.600, "yaw": 0.0},  # Blue_far
         }
+        
+        self.marker_names = {
+            20: "Yellow_close",
+            21: "Blue_close",
+            22: "Yellow_far",
+            23: "Blue_far",
+        }
+
+        self.ids_pub = self.create_publisher(Int32MultiArray, "/aruco_ids", 10)
+        self.selected_tag_pub = self.create_publisher(String, "/aruco_selected_tag", 10)
+        self.pose_pub = self.create_publisher(Pose2D, "/bot_pose_estimate", 10)
 
         # base -> camera_link
         T_base_camera_link = make_T(
@@ -106,7 +121,7 @@ class TagLocalization(Node):
             y=0.00,
             z=0.28,
             roll=0.0,
-            pitch=-math.pi / 4.0,   # 45 deg downward tilt
+            pitch=math.pi / 4.0,   # 45 deg downward tilt
             yaw=0.0,
         )
 
@@ -137,7 +152,6 @@ class TagLocalization(Node):
             @ T_left_camera_optical
         )
 
-        self.pose_pub = self.create_publisher(Pose2D, "/bot_pose_estimate", 10)
 
         self.info_sub = self.create_subscription(
             CameraInfo, camera_info_topic, self.camera_info_callback, 10
@@ -163,6 +177,16 @@ class TagLocalization(Node):
 
             self.get_logger().info("Camera intrinsics received")
 
+    def publish_visible_ids(self, ids_list):
+        msg = Int32MultiArray()
+        msg.data = ids_list
+        self.ids_pub.publish(msg)
+
+    def publish_selected_tag(self, text: str):
+        msg = String()
+        msg.data = text
+        self.selected_tag_pub.publish(msg)
+
     def image_callback(self, msg: Image):
         if self.camera_matrix is None or self.dist_coeffs is None:
             return
@@ -178,22 +202,33 @@ class TagLocalization(Node):
             )
 
             if ids is None or len(ids) == 0:
+                self.publish_visible_ids([])
+                self.publish_selected_tag("NONE")
                 return
 
             ids_flat = ids.flatten().astype(int).tolist()
 
+            visible_known_ids = [marker_id for marker_id in ids_flat if marker_id in self.marker_map]
+            self.publish_visible_ids(visible_known_ids)
+
+            if len(visible_known_ids) == 0:
+                self.publish_selected_tag("NONE")
+                return
+
             s = self.tag_size / 2.0
             obj_pts = np.array([
-                [-s,  s, 0.0],   # top-left
-                [ s,  s, 0.0],   # top-right
-                [ s, -s, 0.0],   # bottom-right
-                [-s, -s, 0.0],   # bottom-left
+                [-s,  s, 0.0],
+                [ s,  s, 0.0],
+                [ s, -s, 0.0],
+                [-s, -s, 0.0],
             ], dtype=np.float32)
 
             if hasattr(cv2, "SOLVEPNP_IPPE_SQUARE"):
                 pnp_flag = cv2.SOLVEPNP_IPPE_SQUARE
             else:
                 pnp_flag = cv2.SOLVEPNP_ITERATIVE
+
+            candidates = []
 
             for marker_corners, marker_id in zip(corners, ids_flat):
                 if marker_id not in self.marker_map:
@@ -228,31 +263,52 @@ class TagLocalization(Node):
                     yaw=marker["yaw"],
                 )
 
-                # field->base = field->marker * inverse(camera->marker) * inverse(base->camera)
                 T_field_base = T_field_marker @ invert_T(T_camera_marker) @ invert_T(self.T_base_camera)
 
-                x = float(T_field_base[0, 3])
-                y = float(T_field_base[1, 3])
-                yaw = math.atan2(T_field_base[1, 0], T_field_base[0, 0])
-
                 pose_msg = Pose2D()
-                pose_msg.x = x
-                pose_msg.y = y
-                pose_msg.theta = yaw
-                self.pose_pub.publish(pose_msg)
+                pose_msg.x = float(T_field_base[0, 3])
+                pose_msg.y = float(T_field_base[1, 3])
+                pose_msg.theta = math.atan2(T_field_base[1, 0], T_field_base[0, 0])
 
-                now_ns = self.get_clock().now().nanoseconds
-                if now_ns - self.last_log_time_ns > 300_000_000:
-                    self.get_logger().info(
-                        f"id={marker_id} | bot_pose: x={x:.3f}, y={y:.3f}, yaw={math.degrees(yaw):.1f} deg"
-                    )
-                    self.last_log_time_ns = now_ns
+                dist = float(np.linalg.norm(tvec.reshape(3)))
 
-                break
+                candidates.append({
+                    "id": marker_id,
+                    "pose": pose_msg,
+                    "dist": dist,
+                })
+
+            if len(candidates) == 0:
+                self.publish_selected_tag("NONE")
+                return
+
+            best = min(candidates, key=lambda c: c["dist"])
+            best_id = best["id"]
+            best_pose = best["pose"]
+
+            self.pose_pub.publish(best_pose)
+
+            best_name = self.marker_names.get(best_id, f"id_{best_id}")
+            visible_names = [self.marker_names.get(i, f"id_{i}") for i in visible_known_ids]
+
+            if len(visible_known_ids) == 1:
+                selected_text = f"{best_name} (ID {best_id})"
+            else:
+                selected_text = f"{best_name} (ID {best_id}) | multiple visible: {visible_names}"
+
+            self.publish_selected_tag(selected_text)
+
+            now_ns = self.get_clock().now().nanoseconds
+            if now_ns - self.last_log_time_ns > 300_000_000:
+                self.get_logger().info(
+                    f"selected={best_name} | visible={visible_names} | "
+                    f"bot_pose: x={best_pose.x:.3f}, y={best_pose.y:.3f}, "
+                    f"yaw={math.degrees(best_pose.theta):.1f} deg"
+                )
+                self.last_log_time_ns = now_ns
 
         except Exception as e:
             self.get_logger().error(f"Localization failed: {e}")
-
 
 def main(args=None):
     rclpy.init(args=args)

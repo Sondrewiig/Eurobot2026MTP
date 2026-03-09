@@ -26,6 +26,9 @@ setup(
             'ground_truth_pose = sondre_bot_control.ground_truth_pose:main',
             'pose_compare = sondre_bot_control.pose_compare:main',
             'telemetry_console = sondre_bot_control.telemetry_console:main',
+            'drive_mode_mux = sondre_bot_control.drive_mode_mux:main',
+            'mode_switch_gui = sondre_bot_control.mode_switch_gui:main',
+            'pose_fuser = sondre_bot_control.pose_fuser:main',
         ],
     },
 )
