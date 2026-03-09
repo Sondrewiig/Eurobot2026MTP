@@ -21,6 +21,11 @@ setup(
     entry_points={
         'console_scripts': [
             'vision_drive = sondre_bot_control.vision_drive:main',
+            'aruco_detect = sondre_bot_control.aruco_detect:main',
+            'tag_localization = sondre_bot_control.tag_localization:main',
+            'ground_truth_pose = sondre_bot_control.ground_truth_pose:main',
+            'pose_compare = sondre_bot_control.pose_compare:main',
+            'telemetry_console = sondre_bot_control.telemetry_console:main',
         ],
     },
 )

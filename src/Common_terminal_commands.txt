@@ -25,11 +25,19 @@ ros2 run sondre_bot_control vision_drive
 
 
 
+------------------------------------------------------------------------------
 
 
+ALT I ETT:
 
+cd ~/sondre_ws
+colcon build
+source install/setup.bash
+ros2 launch sondre_bot_sim sim.launch.py
 
+------------------------------------------------------------------------------
 
+~/sondre_ws/run_sim.sh
 
 
 
@@ -71,3 +79,32 @@ ros2 run sondre_bot_control vision_drive
 
 #Verifying that the bridge is working
 ros2 topic hz /camera/image_raw
+
+
+
+
+
+
+
+
+
+
+# View right camera
+ros2 run image_view image_view --ros-args -r image:=/camera/right/image_raw
+
+
+# View left camera
+ros2 run image_view image_view --ros-args -r image:=/camera/left/image_raw
+
+
+
+
+
+
+
+ros2 run ros_gz_bridge parameter_bridge /camera/left/image_raw@sensor_msgs/msg/Image@gz.msgs.Image /camera/right/image_raw@sensor_msgs/msg/Image@gz.msgs.Image /camera/left/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo /camera/right/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo
+
+
+
+
+

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.10">
-    <world name="car_world">
+    <world name="Eurobot_world">
         <physics name="1ms" type="ignored">
             <max_step_size>0.001</max_step_size>
             <real_time_factor>1.0</real_time_factor>
@@ -22,6 +22,105 @@
         name="gz::sim::systems::Sensors">
   <render_engine>ogre2</render_engine>
 </plugin>
+
+<gui fullscreen="0">
+  <plugin filename="MinimalScene" name="3D View">
+    <gz-gui>
+      <title>3D View</title>
+      <property type="bool" key="showTitleBar">false</property>
+      <property type="string" key="state">docked</property>
+    </gz-gui>
+    <engine>ogre2</engine>
+    <scene>scene</scene>
+    <ambient_light>0.4 0.4 0.4</ambient_light>
+    <background_color>0.8 0.8 0.8</background_color>
+
+    
+    <camera_pose>1.5 -0.9 1.5 0 0.55 1.5708</camera_pose>
+
+    <camera_clip>
+      <near>0.25</near>
+      <far>25000</far>
+    </camera_clip>
+  </plugin>
+
+  <plugin filename="GzSceneManager" name="Scene Manager">
+    <gz-gui>
+      <property key="resizable" type="bool">false</property>
+      <property key="width" type="double">5</property>
+      <property key="height" type="double">5</property>
+      <property key="state" type="string">floating</property>
+      <property key="showTitleBar" type="bool">false</property>
+    </gz-gui>
+  </plugin>
+
+  <plugin filename="WorldControl" name="World control">
+    <gz-gui>
+      <title>World control</title>
+      <property type="bool" key="showTitleBar">false</property>
+      <property type="bool" key="resizable">false</property>
+      <property type="double" key="height">72</property>
+      <property type="double" key="width">121</property>
+      <property type="double" key="z">1</property>
+      <property type="string" key="state">floating</property>
+      <anchors target="3D View">
+        <line own="left" target="left"/>
+        <line own="bottom" target="bottom"/>
+      </anchors>
+    </gz-gui>
+    <play_pause>true</play_pause>
+    <step>true</step>
+    <start_paused>false</start_paused>
+    <service>/world/Eurobot_world/control</service>
+    <stats_topic>/world/Eurobot_world/stats</stats_topic>
+  </plugin>
+
+  <plugin filename="WorldStats" name="World stats">
+    <gz-gui>
+      <title>World stats</title>
+      <property type="bool" key="showTitleBar">false</property>
+      <property type="bool" key="resizable">false</property>
+      <property type="double" key="height">110</property>
+      <property type="double" key="width">290</property>
+      <property type="double" key="z">1</property>
+      <property type="string" key="state">floating</property>
+      <anchors target="3D View">
+        <line own="right" target="right"/>
+        <line own="bottom" target="bottom"/>
+      </anchors>
+    </gz-gui>
+    <sim_time>true</sim_time>
+    <real_time>true</real_time>
+    <real_time_factor>true</real_time_factor>
+    <iterations>true</iterations>
+    <topic>/world/car_world/stats</topic>
+  </plugin>
+<!--   <plugin filename="EntityTree" name="Entity tree"/>
+-->
+
+<plugin filename="ImageDisplay" name="Left camera">
+  <gz-gui>
+    <title>Left camera</title>
+    <property type="string" key="state">floating</property>
+    <property type="double" key="width">420</property>
+    <property type="double" key="height">320</property>
+  </gz-gui>
+  <topic>/camera/left/image_raw</topic>
+  <topic_picker>false</topic_picker>
+</plugin>
+<plugin filename="ImageDisplay" name="Right camera">
+  <gz-gui>
+    <title>Right camera</title>
+    <property type="string" key="state">floating</property>
+    <property type="double" key="width">420</property>
+    <property type="double" key="height">320</property>
+  </gz-gui>
+  <topic>/camera/right/image_raw</topic>
+  <topic_picker>false</topic_picker>
+</plugin>
+
+</gui>
+
 
 <!--  
           Keyboard -> cmd_vel 
@@ -84,7 +183,7 @@
             </attenuation>
             <direction>-0.5 0.1 -0.9</direction>
         </light>
-
+<!--
         <model name="ground_plane">
             <static>true</static>
             <link name="link">
@@ -109,10 +208,52 @@
                     <specular>0.8 0.8 0.8 1</specular>
                 </material>
                 </visual>
+                <pose>0 0 -0.01 0 0 0</pose>
             </link>
         </model>
+ -->
+        <model name="playground_plane">
+  <static>true</static>
+  <link name="link">
+
+    <collision name="collision">
+      <geometry>
+        <plane>
+          <normal>0 0 1</normal>
+          <size>3 2</size>
+        </plane>
+      </geometry>
+    </collision>
+
+    <visual name="visual">
+  <geometry>
+    <plane>
+      <normal>0 0 1</normal>
+      <size>3 2</size>
+    </plane>
+  </geometry>
+
+  <material>
+    <ambient>1 1 1 1</ambient>
+    <diffuse>1 1 1 1</diffuse>
+    <specular>0.1 0.1 0.1 1</specular>
+    <pbr>
+      <metal>
+        <albedo_map>file:///home/sondre/sondre_ws/install/sondre_bot_sim/share/sondre_bot_sim/materials/textures/playground_mat.png</albedo_map>
+        <roughness>1.0</roughness>
+        <metalness>0.0</metalness>
+      </metal>
+    </pbr>
+  </material>
+</visual>
+
+    <pose>1.5 1 0 0 0 0</pose>
+  </link>
+</model>
 
         <model name="sondre_bot" canonical_link="chassis" >
+          <!-- Initial position of BOT-->
+          <pose>0.3 1.9 0 0 0 -1.5707963267949</pose>
 
 <plugin filename="gz-sim-diff-drive-system"
         name="gz::sim::systems::DiffDrive">
@@ -342,12 +483,12 @@
 <!-- add under your model -->
 
 <link name="camera_link">
-  <pose>0.22 0 0.28 0 0 0</pose>
+  <pose>0.22 0 0.28 0 0.78539816 0</pose>
 
   <visual name="camera_visual">
     <geometry>
       <box>
-        <size>0.05 0.05 0.04</size>
+        <size>0.04 0.14 0.04</size>
       </box>
     </geometry>
     <material>
@@ -355,6 +496,35 @@
       <diffuse>0.2 0.2 0.8 1</diffuse>
     </material>
   </visual>
+
+  <visual name="left_lens">
+  <pose>0.016 0.06 0 0 1.57 0</pose>
+
+  <geometry>
+    <cylinder>
+      <radius>0.01</radius>
+      <length>0.01</length>
+    </cylinder>
+  </geometry>
+
+  <material>
+    <ambient>0 0 0 1</ambient>
+    <diffuse>0 0 0 1</diffuse>
+  </material>
+</visual>
+
+
+<visual name="right_lens">
+  <pose>0.016 -0.06 0 0 1.57 0</pose>
+
+  <geometry>
+    <cylinder>
+      <radius>0.01</radius>
+      <length>0.01</length>
+    </cylinder>
+  </geometry>
+
+</visual>
 
   <inertial>
     <mass>0.02</mass>
@@ -365,20 +535,53 @@
     </inertia>
   </inertial>
 
-  <sensor name="front_camera" type="camera">
-  <pose>0 0 0 0 0.5235987756 0</pose>
+  <!-- LEFT CAMERA -->
+
+<sensor name="left_camera" type="camera">
+  <pose>0 0.06 0 0 0 0</pose>
+
   <always_on>true</always_on>
   <update_rate>30</update_rate>
   <visualize>true</visualize>
-  <topic>/camera/image_raw</topic>
+
+  <topic>/camera/left/image_raw</topic>
 
   <camera>
-    <horizontal_fov>1.605</horizontal_fov>
+    <horizontal_fov>1.605</horizontal_fov> <!-- 92 deg -->
     <image>
       <width>640</width>
       <height>480</height>
       <format>R8G8B8</format>
     </image>
+
+    <clip>
+      <near>0.05</near>
+      <far>20</far>
+    </clip>
+  </camera>
+</sensor>
+
+
+<!-- RIGHT CAMERA -->
+
+<sensor name="right_camera" type="camera">
+  <pose>0 -0.06 0 0 0 0</pose>
+
+  <always_on>true</always_on>
+  <update_rate>30</update_rate>
+  <visualize>true</visualize>
+
+  <topic>/camera/right/image_raw</topic>
+
+  <camera>
+    <horizontal_fov>1.605</horizontal_fov>
+
+    <image>
+      <width>640</width>
+      <height>480</height>
+      <format>R8G8B8</format>
+    </image>
+
     <clip>
       <near>0.05</near>
       <far>20</far>
@@ -400,7 +603,7 @@
   <parent>camera_link</parent>
   <child>camera_optical_frame</child>
   <!-- common body->optical rotation -->
-  <pose>0 0 0 -1.57079632679 0 -1.57079632679</pose>
+  <pose>0 0 0 -1.57079632679 0.78539816 -1.57079632679</pose>
 </joint>
 
 
@@ -435,8 +638,8 @@
   <surface>
     <friction>
       <ode>
-        <mu>4.5</mu>
-        <mu2>4.5</mu2>
+        <mu>10</mu>
+        <mu2>10</mu2>
       </ode>
     </friction>
 

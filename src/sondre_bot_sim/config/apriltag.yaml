@@ -1,0 +1,21 @@
+apriltag:
+  ros__parameters:
+    image_transport: raw
+
+    # CHANGE THIS to the family used by the Eurobot tags
+    family: Standard41h12
+
+    # 10 cm tag size
+    size: 0.10
+
+    max_hamming: 0
+
+    detector:
+      threads: 2
+      decimate: 1.0
+      blur: 0.0
+      refine: true
+      sharpening: 0.25
+      debug: false
+
+    pose_estimation_method: "pnp"
