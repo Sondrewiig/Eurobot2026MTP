@@ -9,11 +9,17 @@ from rclpy.qos import qos_profile_sensor_data
 from std_msgs.msg import String, Int32MultiArray
 from std_srvs.srv import SetBool
 from geometry_msgs.msg import Pose2D, Twist
+from geometry_msgs.msg import PoseWithCovarianceStamped
 from sensor_msgs.msg import Imu
 
 
 def wrap_angle(angle: float) -> float:
     return math.atan2(math.sin(angle), math.cos(angle))
+
+def quat_to_yaw(x: float, y: float, z: float, w: float) -> float:
+    siny_cosp = 2.0 * (w * z + x * y)
+    cosy_cosp = 1.0 - 2.0 * (y * y + z * z)
+    return math.atan2(siny_cosp, cosy_cosp)
 
 
 class TelemetryConsole(Node):
@@ -28,6 +34,8 @@ class TelemetryConsole(Node):
         self.cmd_vel = None
         self.drive_mode = "UNKNOWN"
         self.imu_msg = None
+        
+        self.overhead_pose = None
         
         self.selected_tag = None
 
@@ -74,6 +82,13 @@ class TelemetryConsole(Node):
         # Top status row
         top_frame = tk.Frame(self.root)
         top_frame.pack(fill="x", pady=(0, 10))
+        
+        self.create_subscription(
+            PoseWithCovarianceStamped,
+            "/bot_pose_overhead",
+            self.overhead_cb,
+            10,
+        )
 
         self.mode_label = tk.Label(
             top_frame, text="Mode: UNKNOWN", font=("Arial", 16, "bold")
@@ -196,6 +211,18 @@ class TelemetryConsole(Node):
     
     def fused_cb(self, msg: Pose2D):
         self.fused_pose = msg
+        
+    def overhead_cb(self, msg: PoseWithCovarianceStamped):
+        p = Pose2D()
+        p.x = msg.pose.pose.position.x
+        p.y = msg.pose.pose.position.y
+        p.theta = quat_to_yaw(
+            msg.pose.pose.orientation.x,
+            msg.pose.pose.orientation.y,
+            msg.pose.pose.orientation.z,
+            msg.pose.pose.orientation.w,
+        )
+        self.overhead_pose = p
 
     def loc_status_cb(self, msg: String):
         self.localization_status = msg.data
@@ -254,6 +281,9 @@ class TelemetryConsole(Node):
             name = self.marker_names.get(marker_id, f"id_{marker_id}")
             parts.append(f"{marker_id} ({name})")
         return ", ".join(parts)
+    
+    
+
 
     def build_telemetry_text(self):
         lines = []
@@ -267,6 +297,7 @@ class TelemetryConsole(Node):
 
         lines.append(f"Estimate:   {self.fmt_pose(self.fused_pose)}")
         lines.append(f"ArUco Pose: {self.fmt_pose(self.est_pose)}")
+        lines.append(f"Overhead:   {self.fmt_pose(self.overhead_pose)}")
         lines.append(
             f"Loc Status: {self.localization_status if self.localization_status is not None else '---'}"
         )
@@ -290,13 +321,19 @@ class TelemetryConsole(Node):
             )
         else:
             lines.append("Cmd Vel:    ---")
+        
+        
+        
 
+ 
+        """
         lines.append("")
         lines.append(
             f"Manual Cmd: vx={self.current_manual_cmd.linear.x: .3f}   "
             f"wz={self.current_manual_cmd.angular.z: .3f}"
         )
-
+        """
+        
         lines.append("")
         lines.append("IMU:")
         if self.imu_msg is not None:
@@ -384,6 +421,7 @@ class TelemetryConsole(Node):
         if key in self.active_keys:
             self.active_keys.remove(key)
         self.recompute_manual_cmd()
+        
 
     def recompute_manual_cmd(self):
         linear = 0.0

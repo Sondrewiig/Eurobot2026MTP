@@ -29,6 +29,7 @@ setup(
             'drive_mode_mux = sondre_bot_control.drive_mode_mux:main',
             'mode_switch_gui = sondre_bot_control.mode_switch_gui:main',
             'pose_fuser = sondre_bot_control.pose_fuser:main',
+            'overhead_pose_sim = sondre_bot_control.overhead_pose_sim:main',
         ],
     },
 )

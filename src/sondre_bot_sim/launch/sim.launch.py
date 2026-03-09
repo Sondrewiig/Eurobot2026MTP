@@ -109,7 +109,17 @@ def generate_launch_description():
     executable='drive_mode_mux',
     name='drive_mode_mux',
     output='screen',
-)
+    )
+    
+    overhead_pose_sim = Node(
+    package="sondre_bot_control",
+    executable="overhead_pose_sim",
+    output="screen",
+    parameters=[
+        {"pos_noise_std": 0.01},
+        {"yaw_noise_std_deg": 1.0},
+    ],
+    )
 
     return LaunchDescription([
         gazebo,
@@ -121,4 +131,5 @@ def generate_launch_description():
         pose_fuser,
         ground_truth,
         drive_mode_mux,
+        overhead_pose_sim,
     ])
