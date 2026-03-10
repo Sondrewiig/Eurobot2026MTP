@@ -9,7 +9,6 @@ from rclpy.qos import qos_profile_sensor_data
 from std_msgs.msg import String, Int32MultiArray
 from std_srvs.srv import SetBool
 from geometry_msgs.msg import Pose2D, Twist
-from geometry_msgs.msg import PoseWithCovarianceStamped
 from sensor_msgs.msg import Imu
 
 
@@ -37,6 +36,13 @@ class TelemetryConsole(Node):
         
         self.overhead_pose = None
         
+        self.create_subscription(
+            Pose2D,
+            "/vision/robot_pose",
+            self.overhead_pose_callback,
+            10,
+        )
+                
         self.selected_tag = None
 
         self.marker_names = {
@@ -83,12 +89,6 @@ class TelemetryConsole(Node):
         top_frame = tk.Frame(self.root)
         top_frame.pack(fill="x", pady=(0, 10))
         
-        self.create_subscription(
-            PoseWithCovarianceStamped,
-            "/bot_pose_overhead",
-            self.overhead_cb,
-            10,
-        )
 
         self.mode_label = tk.Label(
             top_frame, text="Mode: UNKNOWN", font=("Arial", 16, "bold")
@@ -212,17 +212,8 @@ class TelemetryConsole(Node):
     def fused_cb(self, msg: Pose2D):
         self.fused_pose = msg
         
-    def overhead_cb(self, msg: PoseWithCovarianceStamped):
-        p = Pose2D()
-        p.x = msg.pose.pose.position.x
-        p.y = msg.pose.pose.position.y
-        p.theta = quat_to_yaw(
-            msg.pose.pose.orientation.x,
-            msg.pose.pose.orientation.y,
-            msg.pose.pose.orientation.z,
-            msg.pose.pose.orientation.w,
-        )
-        self.overhead_pose = p
+    def overhead_pose_callback(self, msg: Pose2D):
+        self.overhead_pose = msg
 
     def loc_status_cb(self, msg: String):
         self.localization_status = msg.data
@@ -239,10 +230,6 @@ class TelemetryConsole(Node):
 
     def imu_cb(self, msg: Imu):
         self.imu_msg = msg
-        
-    def imu_cb(self, msg: Imu):
-        self.imu_msg = msg
-        self.get_logger().info(f"IMU callback alive: gz={msg.angular_velocity.z:.5f}")
         
     def selected_tag_cb(self, msg: String):
         self.selected_tag = msg.data
@@ -322,17 +309,9 @@ class TelemetryConsole(Node):
         else:
             lines.append("Cmd Vel:    ---")
         
-        
+                
         
 
- 
-        """
-        lines.append("")
-        lines.append(
-            f"Manual Cmd: vx={self.current_manual_cmd.linear.x: .3f}   "
-            f"wz={self.current_manual_cmd.angular.z: .3f}"
-        )
-        """
         
         lines.append("")
         lines.append("IMU:")

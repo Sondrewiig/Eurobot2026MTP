@@ -124,7 +124,23 @@
   <topic_picker>false</topic_picker>
 </plugin>
 
+
+
+<plugin filename="ImageDisplay" name="Overhead camera">
+  <gz-gui>
+    <title>Overhead camera</title>
+    <property type="string" key="state">floating</property>
+    <property type="double" key="width">420</property>
+    <property type="double" key="height">320</property>
+  </gz-gui>
+  <topic>/overhead_cam/image</topic>
+  <topic_picker>false</topic_picker>
+</plugin>
+
+
 </gui>
+
+
 
 
 <!--  
@@ -335,6 +351,60 @@
   <visualize>false</visualize>
   <topic>/imu</topic>
 </sensor>
+
+
+ <!-- Robot top ArUco tag support -->
+<visual name="bot_tag_post_visual">
+  <pose>0.10 0 0.3875 0 0 0</pose>
+  <geometry>
+    <box>
+      <size>0.02 0.02 0.025</size>
+    </box>
+  </geometry>
+  <material>
+    <ambient>0.15 0.15 0.15 1</ambient>
+    <diffuse>0.15 0.15 0.15 1</diffuse>
+    <specular>0.05 0.05 0.05 1</specular>
+  </material>
+</visual>
+
+<!-- Black backing plate -->
+<visual name="bot_tag_backing_visual">
+  <pose>0.10 0 0.4015 0 0 0</pose>
+  <geometry>
+    <box>
+      <size>0.12 0.12 0.003</size>
+    </box>
+  </geometry>
+  <material>
+    <ambient>0 0 0 1</ambient>
+    <diffuse>0 0 0 1</diffuse>
+    <specular>0 0 0 1</specular>
+  </material>
+</visual>
+
+<!-- Actual tag plate -->
+<visual name="bot_tag_71_visual">
+  <pose>0.10 0 0.4045 0 0 0</pose>
+  <geometry>
+    <box>
+      <size>0.10 0.10 0.002</size>
+    </box>
+  </geometry>
+  <cast_shadows>false</cast_shadows>
+  <material>
+    <ambient>1 1 1 1</ambient>
+    <diffuse>1 1 1 1</diffuse>
+    <specular>0 0 0 1</specular>
+    <pbr>
+      <metal>
+        <albedo_map>file:///home/sondre/sondre_ws/src/sondre_bot_sim/materials/textures/71_Bot_ID_YELLOW.png</albedo_map>
+        <roughness>1.0</roughness>
+        <metalness>0.0</metalness>
+      </metal>
+    </pbr>
+  </material>
+</visual>
 
 </link>
 
@@ -629,7 +699,80 @@
 </model>
 
 
+<model name="overhead_camera">
+  <static>true</static>
+  <pose>1.4 2.1 1.5 0 1.047198 -1.5708</pose>
 
+  <link name="camera_link">
+
+    <!-- Camera body -->
+    <visual name="body_visual">
+      <pose>0 0 0 0 0 0</pose>
+      <geometry>
+        <box>
+          <size>0.12 0.08 0.06</size>
+        </box>
+      </geometry>
+      <material>
+        <ambient>0.15 0.15 0.15 1</ambient>
+        <diffuse>0.2 0.2 0.2 1</diffuse>
+      </material>
+    </visual>
+
+    <!-- Lens / front direction marker -->
+    <visual name="lens_visual">
+      <pose>0.07 0 0 0 1.5708 0</pose>
+      <geometry>
+        <cylinder>
+          <radius>0.018</radius>
+          <length>0.03</length>
+        </cylinder>
+      </geometry>
+      <material>
+        <ambient>0.05 0.05 0.05 1</ambient>
+        <diffuse>0.05 0.05 0.05 1</diffuse>
+      </material>
+    </visual>
+
+    <!-- Small top marker so rotation is easier to see -->
+    <visual name="top_marker_visual">
+      <pose>0 0 0.04 0 0 0</pose>
+      <geometry>
+        <box>
+          <size>0.05 0.02 0.01</size>
+        </box>
+      </geometry>
+      <material>
+        <ambient>0.8 0.1 0.1 1</ambient>
+        <diffuse>0.8 0.1 0.1 1</diffuse>
+      </material>
+    </visual>
+
+    <sensor name="overhead_rgb" type="camera">
+      <pose>0.085 0 0 0 0 0</pose>
+      <always_on>1</always_on>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <topic>/overhead_cam/image</topic>
+
+      <camera>
+        <horizontal_fov>1.6</horizontal_fov>
+        <image>
+          <width>1920</width>
+          <height>1080</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>20.0</far>
+        </clip>
+      </camera>
+    </sensor>
+
+  </link>
+</model>
+
+<!--
 <model name="yellow_ball">
   <pose>1.0 0 0.05 0 0 0</pose>
   <static>false</static>
@@ -689,6 +832,8 @@
     </visual>
   </link>
 </model>
+-->
+
 
     </world>
 </sdf>
