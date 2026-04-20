@@ -1,0 +1,39 @@
+[INFO] [1776691607.970771517] [opencr_bridge]: opencr_bridge starting on /dev/ttyACM0 @ 115200 baud
+[INFO] [1776691608.178899862] [opencr_bridge]: Connected to OpenCR on /dev/ttyACM0
+[WARN] [1776691608.223658328] [opencr_bridge]: Failed parsing GOAL: GOAL 0.0 0.0 0.GOAL_REACHED 0 0 (could not convert string to float: '0.GOAL_REACHED')
+Traceback (most recent call last):
+  File "/home/eurobot2026/sondre_bot_gz/build/sondre_bot_control/sondre_bot_control/opencr_bridge.py", line 467, in main
+    rclpy.spin(node)
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/__init__.py", line 247, in spin
+    executor.spin_once()
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 926, in spin_once
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 907, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 877, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 757, in _wait_for_ready_callbacks
+    wait_set = _rclpy.WaitSet(
+               ^^^^^^^^^^^^^^^
+rclpy._rclpy_pybind11.RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:130
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/eurobot2026/sondre_bot_gz/install/sondre_bot_control/lib/sondre_bot_control/opencr_bridge", line 33, in <module>
+    sys.exit(load_entry_point('sondre-bot-control', 'console_scripts', 'opencr_bridge')())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/eurobot2026/sondre_bot_gz/build/sondre_bot_control/sondre_bot_control/opencr_bridge.py", line 469, in main
+    node.destroy_node()
+  File "/home/eurobot2026/sondre_bot_gz/build/sondre_bot_control/sondre_bot_control/opencr_bridge.py", line 459, in destroy_node
+    self.close_serial()
+  File "/home/eurobot2026/sondre_bot_gz/build/sondre_bot_control/sondre_bot_control/opencr_bridge.py", line 180, in close_serial
+    self.publish_connected(False)
+  File "/home/eurobot2026/sondre_bot_gz/build/sondre_bot_control/sondre_bot_control/opencr_bridge.py", line 133, in publish_connected
+    self.connected_pub.publish(msg)
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/publisher.py", line 70, in publish
+    self.__publisher.publish(msg)
+rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:423
+[ros2run]: Process exited with failure 1

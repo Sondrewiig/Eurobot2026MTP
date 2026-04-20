@@ -1,122 +1,54 @@
 
--- For å launche simulator fra Home directory: --
 
-gz sim ./BOT_jetty/building_robot.sdf
+-------------------------------------------------------------------------------
+  # Run bot system
 
+chmod +x ~/sondre_bot_gz/run_bot.sh
 
-
--- For å launche simulator fra workspace directory: --
-
-gz sim building_robot.sdf
+~/sondre_bot_gz/run_bot.sh
 
 
+-------------------------------------------------------------------------------
+  # Calibrate camera
+
+  # to make it executable (after making changes to the file)
+
+chmod +x ~/sondre_bot_gz/calibrate_camera.sh
+
+  # run it
+
+~/sondre_bot_gz/calibrate_camera.sh
 
 
+  # or with the checkerboard size:
+
+~/sondre_bot_gz/calibrate_camera.sh 8x6 0.024
+
+  # where "8x6" is the grid size and "0.024" is the size of one square in meters (24mm)
+
+-------------------------------------------------------------------------------
+# Get serial data from OpenCR board
 
 
--- ROS2 --
-
-
--- For å kjøre ROS2: --
-
-colcon build
-source install/setup.bash
-ros2 run sondre_bot_control vision_drive
-
-
-
-------------------------------------------------------------------------------
-
-
-ALT I ETT:
-
-cd ~/sondre_ws
-colcon build
-source install/setup.bash
-ros2 launch sondre_bot_sim sim.launch.py
-
-------------------------------------------------------------------------------
-
-~/sondre_ws/run_sim.sh
-
-
-
-
-
-# Terminal 1: Gazebo
-cd ~/sondre_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="src/sondre_bot_sim/worlds/building_robot.sdf"
-
-
-
-
-# Terminal 2: Bridge
-cd ~/sondre_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-ros2 run ros_gz_bridge parameter_bridge \
-  /camera/image_raw@sensor_msgs/msg/Image@gz.msgs.Image \
-  /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
-
-
-
-ELLER
-ros2 run ros_gz_bridge parameter_bridge \
-  /camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image \
-  /cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist
-
-
-
-  # Terminal 3: Your node
-cd ~/sondre_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-ros2 run sondre_bot_control vision_drive
-
-
-
-#Verifying that the bridge is working
-ros2 topic hz /camera/image_raw
-
-
-
-
-
-
-
-
-
-
-# View right camera
-ros2 run image_view image_view --ros-args -r image:=/camera/right/image_raw
-
-
-# View left camera
-ros2 run image_view image_view --ros-args -r image:=/camera/left/image_raw
-
-
-
-
-
-
-
-ros2 run ros_gz_bridge parameter_bridge /camera/left/image_raw@sensor_msgs/msg/Image@gz.msgs.Image /camera/right/image_raw@sensor_msgs/msg/Image@gz.msgs.Image /camera/left/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo /camera/right/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo
-
-
-
+python3 -m serial.tools.miniterm /dev/ttyACM0 115200
 
 
 
 -------------------------------------------------------------------------------
-# Update github repo
+  # Source ROS
+
+source /opt/ros/jazzy/setup.bash
+source ~/sondre_bot_gz/install/setup.bash
+
+
+-------------------------------------------------------------------------------
+  # Update github repo
 
 cd ~/sondre_ws
 
 git status
 git add .
-git commit -m "Update Eurobot Gazebo project"
+git commit -m "Update Eurobot2026MTP project"
 git branch -M main
 
 git remote remove origin 2>/dev/null

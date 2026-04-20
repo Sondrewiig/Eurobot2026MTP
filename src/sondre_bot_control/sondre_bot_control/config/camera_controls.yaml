@@ -1,0 +1,7 @@
+camera_controls:
+  white_balance_automatic: 0
+  brightness: 1
+  contrast: 8
+  gain: 2
+  gamma: 70
+  sharpness: 0

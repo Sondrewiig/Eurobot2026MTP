@@ -1,0 +1,78 @@
+tags:
+  20:
+    name: Yellow_close
+    dictionary: DICT_4X4_100
+    size_m: 0.100
+    role: fixed_field
+    use_for_localization: true
+    use_for_brick_logic: false
+    world_pose:
+      x_m: 0.600
+      y_m: 1.400
+      z_m: 0.000
+      roll_deg: 0.0
+      pitch_deg: 0.0
+      yaw_deg: 0.0
+
+  21:
+    name: Blue_close
+    dictionary: DICT_4X4_100
+    size_m: 0.100
+    role: fixed_field
+    use_for_localization: true
+    use_for_brick_logic: false
+    world_pose:
+      x_m: 2.400
+      y_m: 1.400
+      z_m: 0.000
+      roll_deg: 0.0
+      pitch_deg: 0.0
+      yaw_deg: 0.0
+
+  22:
+    name: Yellow_far
+    dictionary: DICT_4X4_100
+    size_m: 0.100
+    role: fixed_field
+    use_for_localization: true
+    use_for_brick_logic: false
+    world_pose:
+      x_m: 0.600
+      y_m: 0.600
+      z_m: 0.000
+      roll_deg: 0.0
+      pitch_deg: 0.0
+      yaw_deg: 0.0
+
+  23:
+    name: Blue_far
+    dictionary: DICT_4X4_100
+    size_m: 0.100
+    role: fixed_field
+    use_for_localization: true
+    use_for_brick_logic: false
+    world_pose:
+      x_m: 2.400
+      y_m: 0.600
+      z_m: 0.000
+      roll_deg: 0.0
+      pitch_deg: 0.0
+      yaw_deg: 0.0
+
+  36:
+    name: Brick_blue
+    dictionary: DICT_4X4_100
+    size_m: 0.029
+    role: brick
+    brick_color: blue
+    use_for_localization: false
+    use_for_brick_logic: true
+
+  47:
+    name: Brick_yellow
+    dictionary: DICT_4X4_100
+    size_m: 0.029
+    role: brick
+    brick_color: yellow
+    use_for_localization: false
+    use_for_brick_logic: true

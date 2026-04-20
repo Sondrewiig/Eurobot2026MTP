@@ -7,3 +7,6 @@ __pycache__/
 
 .vscode/
 .idea/
+
+stereo_pairs/
+calibration_backup/
