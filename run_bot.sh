@@ -178,7 +178,7 @@ nohup ros2 run sondre_bot_control aruco_detect --ros-args \
   -p debug_image_topic:=/aruco_right/debug_image \
   -p detections_topic:=/aruco_right/detections_json \
   -p use_left_half_only:=false \
-  -p detect_scale:=0.9 \
+  -p detect_scale:=1.0 \
   -p publish_debug_every_n:=2 \
   -p debug_max_width:=960 \
   -r /aruco_ids:=/aruco_right/ids \

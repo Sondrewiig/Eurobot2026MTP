@@ -1,0 +1,26 @@
+# Dustpan + brick-slot configuration for the telemetry console.
+#
+# All values are FRACTIONS of image dimensions (0.0 = top/left, 1.0 =
+# bottom/right). This way the thresholds stay valid even if the camera
+# resolution changes.
+
+dustpan:
+  # Tag cy >= y_threshold * image_height is considered ON the dustpan.
+  # Lower this value to treat tags higher in the frame as "on dustpan".
+  # Raise it to require tags to sit lower in the frame (stricter).
+  y_threshold: 0.75
+
+brick_slots:
+  # Each slot is defined by [cx_min, cx_max] as fractions of image width.
+  # Slot 1 is the LEFTMOST brick, slot 4 is the RIGHTMOST.
+  # A detection whose cx falls in [cx_min*width, cx_max*width) is assigned
+  # to that slot. Ranges should cover the physical locations of the bricks
+  # when they are properly placed on the dustpan.
+  #
+  # Default = even quartiles. Tweak based on actual detections you see in
+  # the telemetry overlay. You can leave narrow "dead zones" between slots
+  # to reject detections that fall between brick positions.
+  1: [0.00, 0.25]
+  2: [0.25, 0.50]
+  3: [0.50, 0.75]
+  4: [0.75, 1.00]

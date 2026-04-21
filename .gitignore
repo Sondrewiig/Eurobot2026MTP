@@ -12,3 +12,4 @@ stereo_pairs/
 calibration_backup/
 src/sondre_bot_sim/
 src/sondre_bot_vision/
+log/
