@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-WORKSPACE="$HOME/sondre_bot_gz"
+WORKSPACE="$HOME/Eurobot2026MTP"
 VIDEO_DEVICE="/dev/video0"
 
 CONFIG_DIR="$WORKSPACE/src/sondre_bot_control/sondre_bot_control/config"
@@ -209,9 +209,9 @@ nohup ros2 run sondre_bot_control telemetry_console --ros-args \
   -p tags_yaml:="$TAGS_YAML" \
   -p left_debug_topic:=/aruco/debug_image \
   -p right_debug_topic:=/aruco_right/debug_image \
+  -p dustpan_config_yaml:="$CONFIG_DIR/dustpan_config.yaml" \
   > "$LOG_DIR/telemetry.log" 2>&1 &
-TEL_PID=$!
-
+  TEL_PID=$!
 sleep 2
 
 echo "[INFO] Pipeline started."
@@ -237,5 +237,6 @@ echo "[INFO] Camera settings come from:"
 echo "  $CAMERA_PARAMS_YAML"
 echo
 echo "[INFO] Press Ctrl+C in this terminal to stop everything."
+
 
 wait "$TEL_PID"

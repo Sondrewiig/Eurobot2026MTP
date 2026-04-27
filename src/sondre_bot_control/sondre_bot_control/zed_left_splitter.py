@@ -26,11 +26,11 @@ class ZedStereoSplitter(Node):
 
         self.declare_parameter(
             "left_calibration_yaml",
-            os.path.expanduser("~/sondre_bot_gz/config/zed_left_camera.yaml"),
+            os.path.expanduser("~/Eurobot2026MTP/config/zed_left_camera.yaml"),
         )
         self.declare_parameter(
             "right_calibration_yaml",
-            os.path.expanduser("~/sondre_bot_gz/config/zed_right_camera.yaml"),
+            os.path.expanduser("~/Eurobot2026MTP/config/zed_right_camera.yaml"),
         )
 
         self.image_in = self.get_parameter("image_in").value

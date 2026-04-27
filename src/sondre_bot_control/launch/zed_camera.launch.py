@@ -18,11 +18,11 @@ def _load_camera_controls(yaml_path: str) -> dict:
 
 def generate_launch_description():
     home = os.path.expanduser("~")
-    v4l2_params = os.path.join(home, "sondre_bot_gz", "config", "v4l2_camera.yaml")
-    splitter_calib = os.path.join(home, "sondre_bot_gz", "config", "zed_left_camera.yaml")
+    v4l2_params = os.path.join(home, "Eurobot2026MTP", "config", "v4l2_camera.yaml")
+    splitter_calib = os.path.join(home, "Eurobot2026MTP", "config", "zed_left_camera.yaml")
     tags_yaml = os.path.join(
         home,
-        "sondre_bot_gz",
+        "Eurobot2026MTP",
         "src",
         "sondre_bot_control",
         "sondre_bot_control",

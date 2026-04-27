@@ -16,7 +16,7 @@ class StereoCapture(Node):
         super().__init__("stereo_capture")
 
         self.declare_parameter("image_topic", "/zed/image_raw")
-        self.declare_parameter("output_dir", str(Path.home() / "sondre_bot_gz" / "stereo_pairs"))
+        self.declare_parameter("output_dir", str(Path.home() / "Eurobot2026MTP" / "stereo_pairs"))
         self.declare_parameter("board_cols", 7)   # inner corners
         self.declare_parameter("board_rows", 10)   # inner corners
         self.declare_parameter("preview_scale", 0.8)

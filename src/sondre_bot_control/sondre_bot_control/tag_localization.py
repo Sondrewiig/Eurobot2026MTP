@@ -6,7 +6,7 @@ import numpy as np
 import rclpy
 from geometry_msgs.msg import Pose2D
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import Bool, String
 
 
 def rotz(yaw: float) -> np.ndarray:
@@ -80,6 +80,8 @@ class TagLocalization(Node):
 
         self.selected_tag_pub = self.create_publisher(String, "/aruco_selected_tag", 10)
         self.pose_pub = self.create_publisher(Pose2D, "/bot_pose_estimate", 10)
+        # NEW: publish whether the pose estimate is currently valid (tag visible)
+        self.pose_valid_pub = self.create_publisher(Bool, "/bot_pose_estimate_valid", 10)
 
         T_base_camera_link = make_T(
             x=0.22,
@@ -131,6 +133,11 @@ class TagLocalization(Node):
         msg.data = text
         self.selected_tag_pub.publish(msg)
 
+    def publish_pose_valid(self, valid: bool):
+        msg = Bool()
+        msg.data = valid
+        self.pose_valid_pub.publish(msg)
+
     def detections_callback(self, msg: String):
         try:
             payload = json.loads(msg.data)
@@ -141,6 +148,10 @@ class TagLocalization(Node):
             for det in detections:
                 marker_id = int(det["id"])
                 if marker_id not in self.marker_map:
+                    continue
+
+                # Need rvec/tvec for pose estimation
+                if "rvec" not in det or "tvec" not in det:
                     continue
 
                 rvec = np.array(det["rvec"], dtype=np.float64).reshape(3, 1)
@@ -183,6 +194,8 @@ class TagLocalization(Node):
 
             if len(candidates) == 0:
                 self.publish_selected_tag("NONE")
+                # NEW: signal that no valid pose is available
+                self.publish_pose_valid(False)
                 return
 
             best = min(candidates, key=lambda c: c["dist"])
@@ -190,6 +203,8 @@ class TagLocalization(Node):
             best_pose = best["pose"]
 
             self.pose_pub.publish(best_pose)
+            # NEW: signal that the pose is valid (actively seeing a tag)
+            self.publish_pose_valid(True)
 
             best_name = self.marker_names.get(best_id, f"id_{best_id}")
             visible_names = [self.marker_names.get(c["id"], f"id_{c['id']}") for c in candidates]

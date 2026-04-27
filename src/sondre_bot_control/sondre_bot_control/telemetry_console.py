@@ -2,6 +2,7 @@
 
 import json
 import math
+import os
 import threading
 import tkinter as tk
 from typing import Optional
@@ -9,6 +10,7 @@ from typing import Optional
 import cv2
 import numpy as np
 import rclpy
+import yaml
 from geometry_msgs.msg import Pose2D, Twist
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
@@ -31,11 +33,23 @@ class TelemetryConsole(Node):
         self.declare_parameter("left_debug_topic", "/aruco/debug_image")
         self.declare_parameter("right_debug_topic", "/aruco_right/debug_image")
         self.declare_parameter("beacon_pose_topic", "/bot_pose_beacon")
+        # Path to the dustpan/brick-slot configuration YAML (Y threshold +
+        # per-slot cx ranges). See load_dustpan_config() for format.
+        self.declare_parameter("dustpan_config_yaml", "")
+        # Fallback image dimensions if no debug image has arrived yet. Camera
+        # is 1920x540 split; left/right halves are 960x540.
+        self.declare_parameter("default_image_width", 960)
+        self.declare_parameter("default_image_height", 540)
 
         tags_yaml = self.get_parameter("tags_yaml").value
         self.left_debug_topic = self.get_parameter("left_debug_topic").value
         self.right_debug_topic = self.get_parameter("right_debug_topic").value
         self.beacon_pose_topic = self.get_parameter("beacon_pose_topic").value
+        self.latest_image_width = int(self.get_parameter("default_image_width").value)
+        self.latest_image_height = int(self.get_parameter("default_image_height").value)
+
+        dustpan_cfg_path = self.get_parameter("dustpan_config_yaml").value
+        self.load_dustpan_config(dustpan_cfg_path)
 
         try:
             self.tag_registry = load_tag_registry(tags_yaml)
@@ -67,8 +81,17 @@ class TelemetryConsole(Node):
         self.localization_status = None
         self.selected_tag = None
 
-        self.latest_aruco_detections = []
+        self.latest_aruco_detections = []        # left lens
+        self.latest_aruco_detections_right = []  # right lens
         self.latest_camera_bricks_text = "---"
+        self.latest_dustpan_text = "---"
+        self.latest_dustpan_states = None  # list of "ON"/"OFF" strings, len up to 4
+        # Per-lens brick states for display
+        self.latest_bricks_left_text = "---"
+        self.latest_bricks_right_text = "---"
+        # Per-lens image dimensions (populated by debug-image callbacks)
+        self.latest_image_width_right = self.latest_image_width
+        self.latest_image_height_right = self.latest_image_height
 
         # Latched last-good brick color sequence. ArUco detection of all 4
         # tags in a single frame is flaky (glare/blur/occlusion), so we cache
@@ -77,6 +100,13 @@ class TelemetryConsole(Node):
         self.latched_brick_colors = None
         self.latched_brick_time_ns = 0
         self.latched_brick_ttl_s = 15.0
+
+        # Per-slot latched dustpan state. We track each slot independently: if
+        # slot 2 was seen as ON 3s ago, that ON reading persists for TTL seconds
+        # even if slot 2 is currently not detected in the frame. This gives the
+        # flip command a memory of each brick's most recent known on/off state.
+        # Each entry is either None (never seen) or a tuple (state, time_ns).
+        self.latched_dustpan_per_slot = {1: None, 2: None, 3: None, 4: None}
 
         # OpenCR state
         self.opencr_connected = False
@@ -90,6 +120,9 @@ class TelemetryConsole(Node):
         self.opencr_goal_pose = None
         self.opencr_imu_yaw_deg = None
         self.opencr_gyro_z = None
+
+        # Control gains from OpenCR (populated by TEL GAINS via /opencr/gains)
+        self.opencr_gains = None  # dict like {"K_RHO": "1.2000", ...}
 
         # Debug image handling
         self.latest_left_debug_msg = None
@@ -128,6 +161,7 @@ class TelemetryConsole(Node):
         self.create_subscription(Image, self.left_debug_topic, self.left_debug_image_cb, qos_profile_sensor_data)
         self.create_subscription(Image, self.right_debug_topic, self.right_debug_image_cb, qos_profile_sensor_data)
         self.create_subscription(String, "/aruco/detections_json", self.aruco_detections_cb, 10)
+        self.create_subscription(String, "/aruco_right/detections_json", self.aruco_right_detections_cb, 10)
 
         self.create_subscription(Bool, "/opencr/connected", self.opencr_connected_cb, 10)
         self.create_subscription(String, "/opencr/status", self.opencr_status_cb, 10)
@@ -140,9 +174,12 @@ class TelemetryConsole(Node):
         self.create_subscription(Pose2D, "/opencr/goal_pose", self.opencr_goal_pose_cb, 10)
         self.create_subscription(Float32, "/opencr/imu_yaw_deg", self.opencr_imu_yaw_deg_cb, 10)
         self.create_subscription(Float32, "/opencr/gyro_z", self.opencr_gyro_z_cb, 10)
+        self.create_subscription(String, "/opencr/gains", self.opencr_gains_cb, 10)
 
         # ---------------- ROS publishers ----------------
         self.go_pub = self.create_publisher(Pose2D, "/opencr/cmd/go", 10)
+        self.go_center_pub = self.create_publisher(Pose2D, "/opencr/cmd/go_center", 10)
+        self.go_dustpan_pub = self.create_publisher(Pose2D, "/opencr/cmd/go_dustpan", 10)
         self.go_home_pub = self.create_publisher(Empty, "/opencr/cmd/go_home", 10)
         self.stop_pub = self.create_publisher(Empty, "/opencr/cmd/stop", 10)
         self.estop_pub = self.create_publisher(Empty, "/opencr/cmd/estop", 10)
@@ -154,6 +191,8 @@ class TelemetryConsole(Node):
         self.set_home_pub = self.create_publisher(Pose2D, "/opencr/cmd/set_home", 10)
         self.get_state_pub = self.create_publisher(Empty, "/opencr/cmd/get_state", 10)
         self.telem_hz_pub = self.create_publisher(Int32, "/opencr/cmd/telemetry_hz", 10)
+        # Raw serial command passthrough for gain tuning and similar low-level commands
+        self.raw_command_pub = self.create_publisher(String, "/opencr/cmd/raw", 10)
 
         # ---------------- GUI ----------------
         self.root = tk.Tk()
@@ -194,6 +233,17 @@ class TelemetryConsole(Node):
         )
         self.mode_label.pack(side="left")
 
+        # Slot overlay toggle — shows configured brick_slots ranges and the
+        # dustpan y_threshold as green bands on each camera image.
+        self.show_slot_overlay = True
+        self.overlay_button = tk.Button(
+            top_frame,
+            text="Slot Overlay: ON",
+            width=18,
+            command=self._toggle_slot_overlay,
+        )
+        self.overlay_button.pack(side="left", padx=(16, 0))
+
         self.opencr_label = tk.Label(
             top_frame,
             text="OpenCR: DISCONNECTED",
@@ -210,10 +260,17 @@ class TelemetryConsole(Node):
         self.command_help_label = tk.Label(
             cmd_frame,
             text=(
-                "Examples: go 0.3 1.8 -90 | go_mm 300 1800 -90 | go home | stop | estop | "
+                "Examples: go 0.3 1.8 -90 | go_mm 300 1800 -90 | "
+                "go_center 0.3 1.8 -90 | go_center_mm 300 1800 -90 | "
+                "go_dustpan 0.3 1.8 -90 | go_dustpan_mm 300 1800 -90 | "
+                "go home | stop | estop | "
                 "flip blue | flip yellow | flip 1 | flip 1,2,3 | "
                 "set_pattern ALL_BLUE | set_pattern ALL_YELLOW | "
-                "reset_odom 0.3 1.8 -90"
+                "reset_odom 0.3 1.8 -90 | "
+                "get_gains | set_k_yaw 0.8 | set_yaw_min 0.03 | "
+                "set_yaw_max 0.20 | set_yaw_tol_deg 3.0 | set_pos_tol 15 | "
+                "push_out | pull_in | carwash_arm 90 | "
+                "carwash_spin_positive | carwash_spin_negative | carwash_spin_stop"
             ),
             justify="left",
             anchor="w",
@@ -358,6 +415,115 @@ class TelemetryConsole(Node):
 
         self.get_logger().info("Telemetry GUI started")
 
+    # ---------------- Dustpan / brick-slot config ----------------
+    def load_dustpan_config(self, path: str):
+        """Load per-lens dustpan Y thresholds and brick-slot CX ranges.
+
+        Expected YAML layout (fractions 0.0-1.0 of each lens's image size):
+
+            left:
+              y_threshold: 0.75
+              brick_slots:
+                1: [0.50, 0.65]     # left lens: bricks are in the right half
+                2: [0.65, 0.75]
+                3: [0.75, 0.85]
+                4: [0.85, 1.00]
+            right:
+              y_threshold: 0.75
+              brick_slots:
+                1: [0.00, 0.15]     # right lens: bricks are in the left half
+                2: [0.15, 0.30]
+                3: [0.30, 0.45]
+                4: [0.45, 0.60]
+
+        Unspecified sections fall back to defaults (y=0.75, even quartiles)."""
+        default_cfg = {
+            "y_threshold": 0.75,
+            "brick_slot_ranges": {
+                1: (0.00, 0.25),
+                2: (0.25, 0.50),
+                3: (0.50, 0.75),
+                4: (0.75, 1.00),
+            },
+        }
+        # Per-lens copies
+        self.dustpan_cfg = {
+            "left": {
+                "y_threshold": default_cfg["y_threshold"],
+                "brick_slot_ranges": dict(default_cfg["brick_slot_ranges"]),
+            },
+            "right": {
+                "y_threshold": default_cfg["y_threshold"],
+                "brick_slot_ranges": dict(default_cfg["brick_slot_ranges"]),
+            },
+        }
+
+        if not path:
+            self.get_logger().info(
+                "No dustpan_config_yaml parameter set; using defaults for both lenses"
+            )
+            return
+
+        if not os.path.isfile(path):
+            self.get_logger().warning(
+                f"Dustpan config file not found: {path} -- using defaults"
+            )
+            return
+
+        try:
+            with open(path, "r") as f:
+                cfg = yaml.safe_load(f) or {}
+        except Exception as e:
+            self.get_logger().warning(
+                f"Failed to parse dustpan config {path}: {e} -- using defaults"
+            )
+            return
+
+        for lens in ("left", "right"):
+            lens_cfg = cfg.get(lens, {}) or {}
+
+            y_thr = lens_cfg.get("y_threshold")
+            if y_thr is not None:
+                try:
+                    self.dustpan_cfg[lens]["y_threshold"] = float(y_thr)
+                except (TypeError, ValueError):
+                    self.get_logger().warning(
+                        f"Invalid {lens}.y_threshold in {path}; keeping default"
+                    )
+
+            slot_cfg = lens_cfg.get("brick_slots", {}) or {}
+            for slot in (1, 2, 3, 4):
+                raw = slot_cfg.get(slot, slot_cfg.get(str(slot)))
+                if raw is None:
+                    continue
+                try:
+                    lo, hi = float(raw[0]), float(raw[1])
+                    if lo >= hi:
+                        raise ValueError(f"lo ({lo}) >= hi ({hi})")
+                    self.dustpan_cfg[lens]["brick_slot_ranges"][slot] = (lo, hi)
+                except Exception as e:
+                    self.get_logger().warning(
+                        f"Invalid {lens}.brick_slots.{slot} in {path}: {e}; keeping default"
+                    )
+
+        self.get_logger().info(
+            f"Loaded dustpan config from {path}: "
+            f"left={self.dustpan_cfg['left']}, right={self.dustpan_cfg['right']}"
+        )
+
+    def assign_brick_to_slot(self, cx: float, lens: str) -> Optional[int]:
+        """Return brick slot (1-4) for a detection's cx in the given lens,
+        or None if it falls outside every configured range."""
+        if lens == "right":
+            w = max(1, self.latest_image_width_right)
+        else:
+            w = max(1, self.latest_image_width)
+        cx_frac = cx / w
+        for slot, (lo, hi) in self.dustpan_cfg[lens]["brick_slot_ranges"].items():
+            if lo <= cx_frac < hi:
+                return slot
+        return None
+
     # ---------------- ROS callbacks ----------------
     def state_cb(self, msg: String):
         self.state = msg.data
@@ -399,10 +565,21 @@ class TelemetryConsole(Node):
     def left_debug_image_cb(self, msg: Image):
         with self.latest_debug_lock:
             self.latest_left_debug_msg = msg
+        # Keep the latest known image dimensions so dustpan/brick-slot detection
+        # can convert fractional thresholds into pixels without guessing.
+        if msg.height > 0:
+            self.latest_image_height = int(msg.height)
+        if msg.width > 0:
+            self.latest_image_width = int(msg.width)
 
     def right_debug_image_cb(self, msg: Image):
         with self.latest_debug_lock:
             self.latest_right_debug_msg = msg
+        # Track right-lens dimensions separately since they may differ from left
+        if msg.height > 0:
+            self.latest_image_height_right = int(msg.height)
+        if msg.width > 0:
+            self.latest_image_width_right = int(msg.width)
 
     def aruco_detections_cb(self, msg: String):
         try:
@@ -410,6 +587,13 @@ class TelemetryConsole(Node):
             self.latest_aruco_detections = payload.get("detections", [])
         except Exception:
             self.latest_aruco_detections = []
+
+    def aruco_right_detections_cb(self, msg: String):
+        try:
+            payload = json.loads(msg.data)
+            self.latest_aruco_detections_right = payload.get("detections", [])
+        except Exception:
+            self.latest_aruco_detections_right = []
 
     def opencr_connected_cb(self, msg: Bool):
         self.opencr_connected = bool(msg.data)
@@ -449,8 +633,49 @@ class TelemetryConsole(Node):
     def opencr_gyro_z_cb(self, msg: Float32):
         self.opencr_gyro_z = float(msg.data)
 
+    def opencr_gains_cb(self, msg: String):
+        """Parse gains string like 'K_RHO=1.2000 K_ALPHA=3.0000 ...' into a dict."""
+        gains = {}
+        for token in msg.data.split():
+            if "=" in token:
+                key, val = token.split("=", 1)
+                gains[key] = val
+        if gains:
+            self.opencr_gains = gains
+
     # ---------------- Image conversion ----------------
-    def rosimg_to_tk(self, msg: Image, max_w: int, max_h: int):
+    def _draw_slot_overlay(self, img, lens: str):
+        """Draw green vertical lines at brick_slots boundaries, slot number
+        labels, and a horizontal line for the dustpan y_threshold. Operates
+        in-place on an RGB numpy image."""
+        h, w = img.shape[:2]
+        cfg = self.dustpan_cfg.get(lens)
+        if not cfg:
+            return
+
+        slot_color_rgb = (0, 220, 0)  # bright green (RGB)
+
+        # Vertical lines at each slot edge.
+        for _, (lo, hi) in cfg["brick_slot_ranges"].items():
+            x1 = int(round(lo * w))
+            x2 = int(round(hi * w))
+            cv2.line(img, (x1, 0), (x1, h - 1), slot_color_rgb, thickness=1)
+            cv2.line(img, (x2, 0), (x2, h - 1), slot_color_rgb, thickness=1)
+
+        # Slot number labels near the top of each band.
+        for slot, (lo, hi) in cfg["brick_slot_ranges"].items():
+            cx = int(round((lo + hi) / 2.0 * w))
+            cv2.putText(
+                img, str(slot), (max(0, cx - 6), 22),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, slot_color_rgb, 2, cv2.LINE_AA,
+            )
+
+        # Horizontal green line at the dustpan y_threshold.
+        y_line = int(round(cfg["y_threshold"] * h))
+        y_line = max(0, min(h - 1, y_line))
+        cv2.line(img, (0, y_line), (w - 1, y_line), slot_color_rgb, thickness=2)
+
+    def rosimg_to_tk(self, msg: Image, max_w: int, max_h: int, lens: str = "left"):
         try:
             enc = msg.encoding.lower()
             buf = np.frombuffer(msg.data, dtype=np.uint8)
@@ -482,6 +707,15 @@ class TelemetryConsole(Node):
                 self.get_logger().warning(f"Unsupported debug image encoding: {msg.encoding}")
                 return None
 
+            # Original frame comes from a read-only buffer; make it writable
+            # so the overlay drawing can modify it in-place.
+            img = np.ascontiguousarray(img)
+
+            # Draw slot/threshold overlay at original resolution for crisp
+            # lines, before we downscale for display.
+            if self.show_slot_overlay:
+                self._draw_slot_overlay(img, lens)
+
             h, w = img.shape[:2]
             scale = min(max_w / w, max_h / h)
             new_w = max(1, int(w * scale))
@@ -500,27 +734,164 @@ class TelemetryConsole(Node):
             return None
 
     # ---------------- Brick inference ----------------
-    def infer_camera_brick_states(self):
-        """Return live [B/Y, B/Y, B/Y, B/Y] only if all 4 tags are seen right
-        now. Also latches the result for fallback use by get_brick_colors_for_flip()."""
-        brick_dets = []
-        for d in self.latest_aruco_detections:
-            tag_id = int(d.get("id", -1))
-            if tag_id in self.brick_tag_to_color:
-                brick_dets.append(d)
+    def _assign_detections_to_slots(self, detections, lens: str):
+        """Map detections from one lens to brick slots 1..4 based on each
+        detection's cx and the lens's configured slot ranges.
 
-        if len(brick_dets) < 4:
-            self.latest_camera_bricks_text = "---"
+        Returns {slot: detection_dict}. If two detections from the same lens
+        land in the same slot, the one lower in the frame (larger cy) wins."""
+        per_slot = {}
+        for d in detections:
+            tag_id = int(d.get("id", -1))
+            if tag_id not in self.brick_tag_to_color:
+                continue
+            slot = self.assign_brick_to_slot(float(d.get("cx", 0.0)), lens)
+            if slot is None:
+                continue
+            prev = per_slot.get(slot)
+            if prev is None or float(d.get("cy", 0.0)) > float(prev.get("cy", 0.0)):
+                per_slot[slot] = d
+        return per_slot
+
+    def _merge_per_slot(self, left_slots, right_slots):
+        """Merge per-slot detections from two lenses into a single per-slot map.
+
+        Strategy: prefer left lens; fall back to right for any slot the left
+        missed. Each returned entry also records which lens it came from so
+        the ON/OFF calculation uses the correct y-threshold/image-height."""
+        merged = {}
+        for slot in (1, 2, 3, 4):
+            left_d = left_slots.get(slot)
+            right_d = right_slots.get(slot)
+            if left_d is not None:
+                merged[slot] = (left_d, "left")
+            elif right_d is not None:
+                merged[slot] = (right_d, "right")
+        return merged
+
+    def _slots_to_colors_text(self, per_slot_detections):
+        """Build a display string like 'BLUE YELLOW ? BLUE' from a per-slot
+        detection dict (values are bare detection dicts, not (d, lens) tuples)."""
+        parts = []
+        for slot in (1, 2, 3, 4):
+            d = per_slot_detections.get(slot)
+            if d is None:
+                parts.append("?")
+            else:
+                parts.append(self.brick_tag_to_color[int(d["id"])])
+        return " ".join(parts)
+
+    def update_dustpan_states(self):
+        """Determine per-slot ON/OFF-dustpan state using whichever lens sees
+        each slot. Uses the corresponding lens's y_threshold and image height
+        so the threshold is meaningful even when the lenses differ in size.
+
+        Also latches the live ON/OFF value for each slot seen this frame so
+        the effective state persists across brief detection dropouts."""
+        left_slots = self._assign_detections_to_slots(
+            self.latest_aruco_detections, "left"
+        )
+        right_slots = self._assign_detections_to_slots(
+            self.latest_aruco_detections_right, "right"
+        )
+
+        # Per-lens display strings
+        self.latest_bricks_left_text = self._slots_to_colors_text(left_slots) \
+            if left_slots else "---"
+        self.latest_bricks_right_text = self._slots_to_colors_text(right_slots) \
+            if right_slots else "---"
+
+        merged = self._merge_per_slot(left_slots, right_slots)
+
+        if not merged:
+            self.latest_dustpan_states = None
+            self.latest_dustpan_text = "---"
             return None
 
-        brick_dets = sorted(brick_dets, key=lambda d: float(d.get("cx", 0.0)))
-        brick_dets = brick_dets[:4]
+        now_ns = self.get_clock().now().nanoseconds
 
-        colors = []
-        for d in brick_dets:
-            tag_id = int(d["id"])
-            colors.append(self.brick_tag_to_color[tag_id])
+        states = []
+        for slot in (1, 2, 3, 4):
+            entry = merged.get(slot)
+            if entry is None:
+                states.append("?")
+                continue
+            d, lens = entry
+            if lens == "right":
+                img_h = max(1, self.latest_image_height_right)
+            else:
+                img_h = max(1, self.latest_image_height)
+            threshold_px = self.dustpan_cfg[lens]["y_threshold"] * img_h
+            cy = float(d.get("cy", 0.0))
+            state = "ON" if cy >= threshold_px else "OFF"
+            states.append(state)
+            # Latch live reading for this slot with its timestamp
+            self.latched_dustpan_per_slot[slot] = (state, now_ns)
 
+        self.latest_dustpan_states = states
+        self.latest_dustpan_text = " ".join(states)
+        return states
+
+    def get_effective_dustpan_states(self):
+        """Return [state_1..state_4] using live detection where available,
+        otherwise falling back to the latched per-slot state if fresh.
+        A slot reports '?' only if we have NEVER seen it (or the last reading
+        is older than the TTL). The `source` string for each slot is 'live',
+        'latched Xs', or 'unknown'."""
+        now_ns = self.get_clock().now().nanoseconds
+        live = self.latest_dustpan_states or ["?"] * 4
+
+        effective = []
+        sources = []
+        for i, slot in enumerate((1, 2, 3, 4)):
+            live_state = live[i] if i < len(live) else "?"
+            if live_state in ("ON", "OFF"):
+                effective.append(live_state)
+                sources.append("live")
+                continue
+            latched = self.latched_dustpan_per_slot.get(slot)
+            if latched is None:
+                effective.append("?")
+                sources.append("unknown")
+                continue
+            state, t_ns = latched
+            age_s = (now_ns - t_ns) / 1e9
+            if age_s > self.latched_brick_ttl_s:
+                effective.append("?")
+                sources.append(f"stale {age_s:.1f}s")
+            else:
+                effective.append(state)
+                sources.append(f"latched {age_s:.1f}s")
+        return effective, sources
+
+    def infer_camera_brick_states(self):
+        """Return live [B/Y, B/Y, B/Y, B/Y] for slots 1..4 if all 4 slots are
+        occupied across the two lenses. Also latches the result for fallback."""
+        # Always update dustpan states first (runs both lenses through slotting)
+        self.update_dustpan_states()
+
+        left_slots = self._assign_detections_to_slots(
+            self.latest_aruco_detections, "left"
+        )
+        right_slots = self._assign_detections_to_slots(
+            self.latest_aruco_detections_right, "right"
+        )
+        merged = self._merge_per_slot(left_slots, right_slots)
+        merged_detections = {slot: entry[0] for slot, entry in merged.items()}
+
+        # Require every slot to be filled (by either lens) for a live reading
+        if any(merged_detections.get(slot) is None for slot in (1, 2, 3, 4)):
+            # Build a partial display string so the user sees what's there
+            partial = self._slots_to_colors_text(merged_detections)
+            self.latest_camera_bricks_text = partial if "?" in partial and any(
+                p != "?" for p in partial.split()
+            ) else ("---" if partial == "? ? ? ?" else partial)
+            return None
+
+        colors = [
+            self.brick_tag_to_color[int(merged_detections[slot]["id"])]
+            for slot in (1, 2, 3, 4)
+        ]
         self.latest_camera_bricks_text = " ".join(colors)
 
         # Latch this good reading for fallback in flip commands
@@ -557,8 +928,41 @@ class TelemetryConsole(Node):
 
         return [i for i in [1, 2, 3, 4] if i not in desired_set]
 
+    def _filter_by_dustpan(self, desired_bricks):
+        """Apply Option A dustpan gating: only return bricks that are currently
+        ON the dustpan (live or recently latched). A brick whose slot is in
+        state '?' (never seen or stale) is NOT filtered out — we assume it's
+        on the dustpan since we have no information to the contrary.
+
+        Returns (kept, skipped_off), both lists of brick indices."""
+        effective, _ = self.get_effective_dustpan_states()
+        kept = []
+        skipped_off = []
+        for b in desired_bricks:
+            idx = int(b)
+            state = effective[idx - 1] if 1 <= idx <= 4 else "?"
+            if state == "OFF":
+                skipped_off.append(idx)
+            else:
+                # ON or '?' (unknown/stale) -- keep it
+                kept.append(idx)
+        return kept, skipped_off
+
     def publish_flip_bricks(self, desired_bricks):
-        low_level = self.desired_bricks_to_low_level_indices(desired_bricks)
+        # Option A: skip bricks that are confirmed OFF the dustpan. Unknown
+        # bricks ('?') still get flipped since we have no reason to block them.
+        kept, skipped_off = self._filter_by_dustpan(desired_bricks)
+
+        if not kept:
+            if skipped_off:
+                self.command_feedback = (
+                    f"No bricks to flip (all targets OFF dustpan: {skipped_off})"
+                )
+            else:
+                self.command_feedback = "No bricks need flipping"
+            return
+
+        low_level = self.desired_bricks_to_low_level_indices(kept)
         if not low_level:
             self.command_feedback = "No bricks need flipping"
             return
@@ -566,7 +970,10 @@ class TelemetryConsole(Node):
         msg = Int32MultiArray()
         msg.data = low_level
         self.flip_seq_pub.publish(msg)
-        self.command_feedback = f"SENT flip desired={desired_bricks} low_level={low_level}"
+        feedback = f"SENT flip desired={kept} low_level={low_level}"
+        if skipped_off:
+            feedback += f" SKIPPED_OFF={skipped_off}"
+        self.command_feedback = feedback
 
     def parse_brick_index_csv(self, text):
         items = [s.strip() for s in text.replace(" ", "").split(",") if s.strip()]
@@ -637,6 +1044,21 @@ class TelemetryConsole(Node):
         lines.append("Goal position:")
         lines.append(f"  Goal pose:        {self.fmt_pose(self.opencr_goal_pose)}")
 
+        lines.append("")
+        lines.append("Control gains:")
+        if self.opencr_gains is not None:
+            g = self.opencr_gains
+            lines.append(f"  K_rho:     {g.get('K_RHO', '---')}")
+            lines.append(f"  K_alpha:   {g.get('K_ALPHA', '---')}")
+            lines.append(f"  K_alpha_i: {g.get('K_ALPHA_I', '---')}")
+            lines.append(f"  K_yaw:     {g.get('K_YAW', '---')}")
+            lines.append(f"  Pos tol:   {g.get('POS_TOL_MM', '---')} mm")
+            lines.append(f"  Yaw tol:   {g.get('YAW_TOL_DEG', '---')} deg")
+            lines.append(f"  Yaw min:   {g.get('YAW_MIN', '---')} rad/s")
+            lines.append(f"  Yaw max:   {g.get('YAW_MAX', '---')} rad/s")
+        else:
+            lines.append("  (type 'get_gains' to fetch)")
+
         return "\n".join(lines)
 
     def build_telemetry_text_right(self):
@@ -647,7 +1069,21 @@ class TelemetryConsole(Node):
         lines.append(f"  Status:      {self.opencr_status if self.opencr_status is not None else '---'}")
         lines.append(f"  Brick state: {self.opencr_brick_state if self.opencr_brick_state is not None else '---'}")
         self.infer_camera_brick_states()
+        lines.append(f"  Bricks L:      {self.latest_bricks_left_text}")
+        lines.append(f"  Bricks R:      {self.latest_bricks_right_text}")
         lines.append(f"  Camera bricks: {self.latest_camera_bricks_text}")
+        lines.append(f"  Dustpan:       {self.latest_dustpan_text}")
+
+        # Effective dustpan state (live + latched) -- this is what the flip
+        # commands actually use to filter targets. '?' means never seen or stale.
+        effective, sources = self.get_effective_dustpan_states()
+        marked = []
+        for st, src in zip(effective, sources):
+            if src.startswith("latched"):
+                marked.append(f"{st}*")  # asterisk = from memory
+            else:
+                marked.append(st)
+        lines.append(f"  Dustpan eff:   {' '.join(marked)}  (* = latched)")
 
         # Show the latched (last-good) brick reading and its age, which is
         # what the flip commands will fall back on when the current frame
@@ -758,6 +1194,17 @@ class TelemetryConsole(Node):
 
         self.command_status_label.config(text=self.command_feedback)
 
+    def publish_raw_opencr_command(self, text: str):
+        msg = String()
+        msg.data = text.strip()
+        self.raw_command_pub.publish(msg)
+
+    def parse_single_float(self, text: str) -> float:
+        text = text.strip()
+        if not text:
+            raise ValueError("expected numeric value")
+        return float(text)
+
     def handle_command_text(self, cmd: str):
         cmd = cmd.strip()
         cmd_lower = cmd.lower()
@@ -771,6 +1218,7 @@ class TelemetryConsole(Node):
         head = parts[0].lower()
         tail = parts[1].strip() if len(parts) > 1 else ""
 
+        # ---------------- Goal commands ----------------
         if head == "go":
             if tail.lower() in ("home", "go_home"):
                 self.go_home_pub.publish(Empty())
@@ -779,15 +1227,52 @@ class TelemetryConsole(Node):
 
             pose = self.parse_pose_m(tail.split())
             self.go_pub.publish(pose)
-            self.command_feedback = f"SENT: GO {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            self.command_feedback = (
+                f"SENT: GO {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
             return
 
         if head == "go_mm":
             pose = self.parse_pose_mm(tail.split())
             self.go_pub.publish(pose)
-            self.command_feedback = f"SENT: GO {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            self.command_feedback = (
+                f"SENT: GO {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
             return
 
+        if head == "go_center":
+            pose = self.parse_pose_m(tail.split())
+            self.go_center_pub.publish(pose)
+            self.command_feedback = (
+                f"SENT: GO_CENTER {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
+            return
+
+        if head == "go_center_mm":
+            pose = self.parse_pose_mm(tail.split())
+            self.go_center_pub.publish(pose)
+            self.command_feedback = (
+                f"SENT: GO_CENTER {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
+            return
+
+        if head == "go_dustpan":
+            pose = self.parse_pose_m(tail.split())
+            self.go_dustpan_pub.publish(pose)
+            self.command_feedback = (
+                f"SENT: GO_DUSTPAN {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
+            return
+
+        if head == "go_dustpan_mm":
+            pose = self.parse_pose_mm(tail.split())
+            self.go_dustpan_pub.publish(pose)
+            self.command_feedback = (
+                f"SENT: GO_DUSTPAN {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
+            return
+
+        # ---------------- Basic OpenCR commands ----------------
         if head == "stop":
             self.stop_pub.publish(Empty())
             self.command_feedback = "SENT: STOP"
@@ -798,6 +1283,106 @@ class TelemetryConsole(Node):
             self.command_feedback = "SENT: ESTOP"
             return
 
+        if head == "get_state":
+            self.get_state_pub.publish(Empty())
+            self.command_feedback = "SENT: GET_STATE"
+            return
+
+        if head == "telem":
+            hz = int(tail)
+            msg = Int32()
+            msg.data = hz
+            self.telem_hz_pub.publish(msg)
+            self.command_feedback = f"SENT: TELEM {hz}"
+            return
+
+        # ---------------- Gain / tolerance tuning ----------------
+        if head == "get_gains":
+            self.publish_raw_opencr_command("GET_GAINS")
+            self.command_feedback = "SENT: GET_GAINS"
+            return
+
+        if head == "set_k_rho":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_K_RHO {v}")
+            self.command_feedback = f"SENT: SET_K_RHO {v}"
+            return
+
+        if head == "set_k_alpha":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_K_ALPHA {v}")
+            self.command_feedback = f"SENT: SET_K_ALPHA {v}"
+            return
+
+        if head == "set_k_alpha_i":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_K_ALPHA_I {v}")
+            self.command_feedback = f"SENT: SET_K_ALPHA_I {v}"
+            return
+
+        if head == "set_k_yaw":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_K_YAW {v}")
+            self.command_feedback = f"SENT: SET_K_YAW {v}"
+            return
+
+        if head == "set_pos_tol":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_POS_TOL {v}")
+            self.command_feedback = f"SENT: SET_POS_TOL {v}"
+            return
+
+        if head == "set_yaw_tol_deg":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_YAW_TOL_DEG {v}")
+            self.command_feedback = f"SENT: SET_YAW_TOL_DEG {v}"
+            return
+
+        if head == "set_yaw_min":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_YAW_MIN {v}")
+            self.command_feedback = f"SENT: SET_YAW_MIN {v}"
+            return
+
+        if head == "set_yaw_max":
+            v = self.parse_single_float(tail)
+            self.publish_raw_opencr_command(f"SET_YAW_MAX {v}")
+            self.command_feedback = f"SENT: SET_YAW_MAX {v}"
+            return
+
+        # ---------------- Carwash commands ----------------
+        if head == "push_out":
+            self.publish_raw_opencr_command("PUSH_OUT")
+            self.command_feedback = "SENT: PUSH_OUT"
+            return
+
+        if head == "pull_in":
+            self.publish_raw_opencr_command("PULL_IN")
+            self.command_feedback = "SENT: PULL_IN"
+            return
+
+        if head == "carwash_arm":
+            v = int(self.parse_single_float(tail))
+            self.publish_raw_opencr_command(f"CARWASH_ARM {v}")
+            self.command_feedback = f"SENT: CARWASH_ARM {v}"
+            return
+
+        if head == "carwash_spin_positive":
+            self.publish_raw_opencr_command("CARWASH_SPIN_POSITIVE")
+            self.command_feedback = "SENT: CARWASH_SPIN_POSITIVE"
+            return
+
+        if head == "carwash_spin_negative":
+            self.publish_raw_opencr_command("CARWASH_SPIN_NEGATIVE")
+            self.command_feedback = "SENT: CARWASH_SPIN_NEGATIVE"
+            return
+
+        if head == "carwash_spin_stop":
+            self.publish_raw_opencr_command("CARWASH_SPIN_STOP")
+            self.command_feedback = "SENT: CARWASH_SPIN_STOP"
+            return
+
+        # ---------------- Flip / pattern commands ----------------
         if head == "flip":
             tail_lower = tail.lower().strip()
 
@@ -869,41 +1454,37 @@ class TelemetryConsole(Node):
             self.command_feedback = f"SENT: SET_BRICKS {tail}"
             return
 
+        # ---------------- Pose reset / home ----------------
         if head == "reset_odom":
             pose = self.parse_pose_m(tail.split())
             self.reset_odom_pub.publish(pose)
-            self.command_feedback = f"SENT: RESET_ODOM {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            self.command_feedback = (
+                f"SENT: RESET_ODOM {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
             return
 
         if head == "reset_odom_mm":
             pose = self.parse_pose_mm(tail.split())
             self.reset_odom_pub.publish(pose)
-            self.command_feedback = f"SENT: RESET_ODOM {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            self.command_feedback = (
+                f"SENT: RESET_ODOM {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
             return
 
         if head == "set_home":
             pose = self.parse_pose_m(tail.split())
             self.set_home_pub.publish(pose)
-            self.command_feedback = f"SENT: SET_HOME {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            self.command_feedback = (
+                f"SENT: SET_HOME {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
             return
 
         if head == "set_home_mm":
             pose = self.parse_pose_mm(tail.split())
             self.set_home_pub.publish(pose)
-            self.command_feedback = f"SENT: SET_HOME {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
-            return
-
-        if head == "get_state":
-            self.get_state_pub.publish(Empty())
-            self.command_feedback = "SENT: GET_STATE"
-            return
-
-        if head == "telem":
-            hz = int(tail)
-            msg = Int32()
-            msg.data = hz
-            self.telem_hz_pub.publish(msg)
-            self.command_feedback = f"SENT: TELEM {hz}"
+            self.command_feedback = (
+                f"SENT: SET_HOME {pose.x:.3f} {pose.y:.3f} {math.degrees(pose.theta):.1f}"
+            )
             return
 
         raise ValueError("unknown command")
@@ -948,7 +1529,7 @@ class TelemetryConsole(Node):
         max_img_h = max(180, min(380, int(root_h * 0.35)))
 
         if left_msg_to_render is not None:
-            tk_img = self.rosimg_to_tk(left_msg_to_render, max_w_per_image, max_img_h)
+            tk_img = self.rosimg_to_tk(left_msg_to_render, max_w_per_image, max_img_h, lens="left")
             if tk_img is not None:
                 self.left_debug_image_tk = tk_img
                 self.left_debug_label.configure(image=self.left_debug_image_tk, text="")
@@ -956,7 +1537,7 @@ class TelemetryConsole(Node):
             self.last_left_debug_render_ns = now_ns
 
         if right_msg_to_render is not None:
-            tk_img = self.rosimg_to_tk(right_msg_to_render, max_w_per_image, max_img_h)
+            tk_img = self.rosimg_to_tk(right_msg_to_render, max_w_per_image, max_img_h, lens="right")
             if tk_img is not None:
                 self.right_debug_image_tk = tk_img
                 self.right_debug_label.configure(image=self.right_debug_image_tk, text="")
@@ -993,6 +1574,15 @@ class TelemetryConsole(Node):
         if self._is_fullscreen:
             self._is_fullscreen = False
             self.root.attributes("-fullscreen", False)
+
+    def _toggle_slot_overlay(self):
+        self.show_slot_overlay = not self.show_slot_overlay
+        state_str = "ON" if self.show_slot_overlay else "OFF"
+        self.overlay_button.config(text=f"Slot Overlay: {state_str}")
+        # Invalidate render timestamps so the next refresh redraws both images
+        # immediately instead of waiting for the throttle interval.
+        self.last_left_debug_render_ns = 0
+        self.last_right_debug_render_ns = 0
 
     def on_close(self):
         self.root.quit()

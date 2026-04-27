@@ -24,10 +24,10 @@ def save_opencv_yaml(path, data):
 
 def main():
     home = Path.home()
-    pairs_dir = home / "sondre_bot_gz" / "stereo_pairs"
+    pairs_dir = home / "Eurobot2026MTP" / "stereo_pairs"
     left_dir = pairs_dir / "left"
     right_dir = pairs_dir / "right"
-    out_dir = home / "sondre_bot_gz" / "config"
+    out_dir = home / "Eurobot2026MTP" / "config"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     pattern_size = (7, 10)   # inner corners

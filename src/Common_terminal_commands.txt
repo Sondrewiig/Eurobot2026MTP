@@ -3,10 +3,10 @@
 -------------------------------------------------------------------------------
   # Run bot system
 
-chmod +x ~/sondre_bot_gz/run_bot.sh
 
-~/sondre_bot_gz/run_bot.sh
+chmod +x ~/Eurobot2026MTP/run_bot.sh
 
+~/Eurobot2026MTP/run_bot.sh
 
 -------------------------------------------------------------------------------
   # Calibrate camera

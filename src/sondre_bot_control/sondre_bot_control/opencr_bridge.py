@@ -58,6 +58,11 @@ class OpenCRBridge(Node):
         self.latest_camera_pose_time: float = 0.0
         self.last_synced_camera_pose: Optional[tuple[float, float, float]] = None
 
+        # NEW: track whether the pose estimate is currently valid
+        # (i.e. tag_localization is actively seeing a tag right now)
+        self.camera_pose_valid: bool = False
+        self.camera_pose_valid_time: float = 0.0
+
         self.port: str = self.get_parameter("port").value
         self.baud: int = int(self.get_parameter("baud").value)
         self.telemetry_hz: int = int(self.get_parameter("telemetry_hz").value)
@@ -90,11 +95,15 @@ class OpenCRBridge(Node):
         self.goal_pose_pub = self.create_publisher(Pose2D, "/opencr/goal_pose", 20)
         self.imu_yaw_deg_pub = self.create_publisher(Float32, "/opencr/imu_yaw_deg", 20)
         self.gyro_z_pub = self.create_publisher(Float32, "/opencr/gyro_z", 20)
+        # NEW: republish gains so telemetry_console can display them
+        self.gains_pub = self.create_publisher(String, "/opencr/gains", 20)
 
         self.imu_pub = self.create_publisher(Imu, "/imu", 20)
 
         # ---------------- Subscribers ----------------
         self.create_subscription(Pose2D, "/opencr/cmd/go", self.go_cmd_cb, 10)
+        self.create_subscription(Pose2D, "/opencr/cmd/go_center", self.go_center_cmd_cb, 10)
+        self.create_subscription(Pose2D, "/opencr/cmd/go_dustpan", self.go_dustpan_cmd_cb, 10)
         self.create_subscription(Empty, "/opencr/cmd/go_home", self.go_home_cmd_cb, 10)
         self.create_subscription(Empty, "/opencr/cmd/stop", self.stop_cmd_cb, 10)
         self.create_subscription(Empty, "/opencr/cmd/estop", self.estop_cmd_cb, 10)
@@ -107,6 +116,11 @@ class OpenCRBridge(Node):
         self.create_subscription(Empty, "/opencr/cmd/get_state", self.get_state_cmd_cb, 10)
         self.create_subscription(Int32, "/opencr/cmd/telemetry_hz", self.telemetry_hz_cmd_cb, 10)
         self.create_subscription(Pose2D, self.camera_pose_topic, self.camera_pose_cb, 10)
+        # NEW: subscribe to the pose validity flag from tag_localization
+        self.create_subscription(Bool, "/bot_pose_estimate_valid", self.camera_pose_valid_cb, 10)
+        # Raw command passthrough
+        self.create_subscription(String, "/opencr/cmd/raw", self.raw_cmd_cb, 10)
+
         self.pose_sync_timer = self.create_timer(self.pose_sync_period_s, self.sync_camera_pose_timer_cb)
 
         # ---------------- Timers ----------------
@@ -344,6 +358,11 @@ class OpenCRBridge(Node):
             self.publish_string(self.brick_state_pub, " ".join(parts[1:]))
             return
 
+        if kind == "GAINS":
+            # Forward the raw gains string to the telemetry console
+            self.publish_string(self.gains_pub, " ".join(parts[1:]))
+            return
+
     # =========================================================
     # ROS -> serial command callbacks
     # =========================================================
@@ -352,6 +371,18 @@ class OpenCRBridge(Node):
         y_mm = msg.y * 1000.0
         yaw_deg = math.degrees(msg.theta)
         self.send_line(f"GO {x_mm:.1f} {y_mm:.1f} {yaw_deg:.1f}")
+
+    def go_center_cmd_cb(self, msg: Pose2D) -> None:
+        x_mm = msg.x * 1000.0
+        y_mm = msg.y * 1000.0
+        yaw_deg = math.degrees(msg.theta)
+        self.send_line(f"GO_CENTER {x_mm:.1f} {y_mm:.1f} {yaw_deg:.1f}")
+
+    def go_dustpan_cmd_cb(self, msg: Pose2D) -> None:
+        x_mm = msg.x * 1000.0
+        y_mm = msg.y * 1000.0
+        yaw_deg = math.degrees(msg.theta)
+        self.send_line(f"GO_DUSTPAN {x_mm:.1f} {y_mm:.1f} {yaw_deg:.1f}")
 
     def go_home_cmd_cb(self, _msg: Empty) -> None:
         self.send_line("GO_HOME")
@@ -407,9 +438,20 @@ class OpenCRBridge(Node):
             hz = 0
         self.send_line(f"TELEM {hz}")
 
+    def raw_cmd_cb(self, msg: String) -> None:
+        """Pass a raw serial command through to the OpenCR."""
+        text = msg.data.strip()
+        if text:
+            self.send_line(text)
+
     def camera_pose_cb(self, msg: Pose2D) -> None:
         self.latest_camera_pose = msg
         self.latest_camera_pose_time = time.time()
+
+    def camera_pose_valid_cb(self, msg: Bool) -> None:
+        """Called by tag_localization to indicate whether a tag is currently visible."""
+        self.camera_pose_valid = bool(msg.data)
+        self.camera_pose_valid_time = time.time()
 
     def angle_diff_deg(self, a: float, b: float) -> float:
         d = a - b
@@ -426,6 +468,15 @@ class OpenCRBridge(Node):
             return
         if self.latest_camera_pose is None:
             return
+
+        # NEW: Only sync if the pose estimate is currently valid
+        # (tag_localization is actively seeing a tag).
+        # Also require the validity signal itself to be fresh.
+        if not self.camera_pose_valid:
+            return
+        if time.time() - self.camera_pose_valid_time > self.pose_sync_max_staleness_s:
+            return
+
         if time.time() - self.latest_camera_pose_time > self.pose_sync_max_staleness_s:
             return
 
@@ -444,7 +495,7 @@ class OpenCRBridge(Node):
         x_mm = x_m * 1000.0
         y_mm = y_m * 1000.0
 
-        if self.send_line(f"RESET_ODOM {x_mm:.1f} {y_mm:.1f} {yaw_deg:.1f}"):
+        if self.send_line(f"SYNC_POSE {x_mm:.1f} {y_mm:.1f} {yaw_deg:.1f}"):
             self.last_synced_camera_pose = (x_m, y_m, yaw_deg)
 
     # =========================================================

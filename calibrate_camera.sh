@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-WORKSPACE="$HOME/sondre_bot_gz"
+WORKSPACE="$HOME/Eurobot2026MTP"
 VIDEO_DEVICE="/dev/video0"
 IMAGE_SIZE="[1344,376]"
 FPS="[1,15]"

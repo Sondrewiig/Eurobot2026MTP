@@ -21,7 +21,7 @@ class StereoRectify(Node):
         self.declare_parameter("right_rect_topic", "/camera/right/image_rect")
         self.declare_parameter(
             "stereo_yaml",
-            str(Path.home() / "sondre_bot_gz" / "config" / "zed_stereo.yaml"),
+            str(Path.home() / "Eurobot2026MTP" / "config" / "zed_stereo.yaml"),
         )
         self.declare_parameter("queue_size", 5)
 
