@@ -24,6 +24,7 @@ ARUCO_LEFT_PID=""
 ARUCO_RIGHT_PID=""
 LOC_PID=""
 OPENCR_PID=""
+RBPI_PID=""
 TEL_PID=""
 
 
@@ -33,13 +34,13 @@ apply_camera_controls() {
 
     echo "[INFO] Applying camera controls from $yaml_file..."
 
-    # Extract the camera_controls block from YAML using python
     python3 - "$yaml_file" "$device" <<'PYEOF'
 import sys
 import subprocess
 import yaml
 
 yaml_path, device = sys.argv[1], sys.argv[2]
+
 try:
     with open(yaml_path, "r") as f:
         data = yaml.safe_load(f) or {}
@@ -66,15 +67,20 @@ PYEOF
 cleanup() {
     echo
     echo "[INFO] Stopping pipeline..."
+
     pkill -f "v4l2_camera_node" || true
     pkill -f "zed_left_splitter" || true
     pkill -f "aruco_detect" || true
     pkill -f "tag_localization" || true
     pkill -f "opencr_bridge" || true
+    pkill -f "rbpi_metrics" || true
     pkill -f "telemetry_console" || true
+
     sleep 1
 }
+
 trap cleanup EXIT INT TERM
+
 
 echo "[INFO] Sourcing ROS and workspace..."
 set +u
@@ -91,6 +97,7 @@ fi
 
 source "$WORKSPACE/install/setup.bash"
 set -u
+
 
 if [ ! -f "$CAMERA_PARAMS_YAML" ]; then
     echo "[ERROR] Missing camera config file: $CAMERA_PARAMS_YAML"
@@ -112,14 +119,17 @@ if [ ! -f "$TAGS_YAML" ]; then
     exit 1
 fi
 
+
 echo "[INFO] Killing stale processes..."
 pkill -f "v4l2_camera_node" || true
 pkill -f "zed_left_splitter" || true
 pkill -f "aruco_detect" || true
 pkill -f "tag_localization" || true
 pkill -f "opencr_bridge" || true
+pkill -f "rbpi_metrics" || true
 pkill -f "telemetry_console" || true
 sleep 1
+
 
 echo "[INFO] Starting camera from config: $CAMERA_PARAMS_YAML"
 nohup ros2 run v4l2_camera v4l2_camera_node --ros-args \
@@ -134,10 +144,10 @@ sleep 2
 
 apply_camera_controls "$CAMERA_CONTROLS_YAML" "$VIDEO_DEVICE"
 
-
 echo "[INFO] Camera settings come from:"
 echo "  $CAMERA_PARAMS_YAML"
 echo "  $CAMERA_CONTROLS_YAML"
+
 
 echo "[INFO] Starting stereo splitter..."
 nohup ros2 run sondre_bot_control zed_left_splitter --ros-args \
@@ -154,6 +164,7 @@ SPLIT_PID=$!
 
 sleep 2
 
+
 echo "[INFO] Starting left ArUco detector..."
 nohup ros2 run sondre_bot_control aruco_detect --ros-args \
   -p image_topic:=/camera/left/image_raw \
@@ -169,6 +180,7 @@ nohup ros2 run sondre_bot_control aruco_detect --ros-args \
 ARUCO_LEFT_PID=$!
 
 sleep 2
+
 
 echo "[INFO] Starting right ArUco detector..."
 nohup ros2 run sondre_bot_control aruco_detect --ros-args \
@@ -187,6 +199,7 @@ ARUCO_RIGHT_PID=$!
 
 sleep 2
 
+
 echo "[INFO] Starting tag localization..."
 nohup ros2 run sondre_bot_control tag_localization --ros-args \
   -p tags_yaml:="$TAGS_YAML" \
@@ -194,6 +207,7 @@ nohup ros2 run sondre_bot_control tag_localization --ros-args \
 LOC_PID=$!
 
 sleep 2
+
 
 echo "[INFO] Starting OpenCR bridge..."
 nohup ros2 run sondre_bot_control opencr_bridge --ros-args \
@@ -204,6 +218,15 @@ OPENCR_PID=$!
 
 sleep 2
 
+
+echo "[INFO] Starting Raspberry Pi health metrics publisher..."
+nohup ros2 run sondre_bot_control rbpi_metrics \
+  > "$LOG_DIR/rbpi_metrics.log" 2>&1 &
+RBPI_PID=$!
+
+sleep 1
+
+
 echo "[INFO] Starting telemetry GUI..."
 nohup ros2 run sondre_bot_control telemetry_console --ros-args \
   -p tags_yaml:="$TAGS_YAML" \
@@ -211,8 +234,10 @@ nohup ros2 run sondre_bot_control telemetry_console --ros-args \
   -p right_debug_topic:=/aruco_right/debug_image \
   -p dustpan_config_yaml:="$CONFIG_DIR/dustpan_config.yaml" \
   > "$LOG_DIR/telemetry.log" 2>&1 &
-  TEL_PID=$!
+TEL_PID=$!
+
 sleep 2
+
 
 echo "[INFO] Pipeline started."
 echo "[INFO] PIDs:"
@@ -222,6 +247,7 @@ echo "  aruco_left=$ARUCO_LEFT_PID"
 echo "  aruco_right=$ARUCO_RIGHT_PID"
 echo "  localization=$LOC_PID"
 echo "  opencr=$OPENCR_PID"
+echo "  rbpi_metrics=$RBPI_PID"
 echo "  telemetry=$TEL_PID"
 echo
 echo "[INFO] Logs:"
@@ -231,10 +257,12 @@ echo "  $LOG_DIR/aruco_left.log"
 echo "  $LOG_DIR/aruco_right.log"
 echo "  $LOG_DIR/tag_localization.log"
 echo "  $LOG_DIR/opencr.log"
+echo "  $LOG_DIR/rbpi_metrics.log"
 echo "  $LOG_DIR/telemetry.log"
 echo
 echo "[INFO] Camera settings come from:"
 echo "  $CAMERA_PARAMS_YAML"
+echo "  $CAMERA_CONTROLS_YAML"
 echo
 echo "[INFO] Press Ctrl+C in this terminal to stop everything."
 

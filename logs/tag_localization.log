@@ -1,2 +1,150 @@
-[INFO] [1777301881.384883954] [tag_localization]: tag_localization started
-[INFO] [1777301881.385805985] [tag_localization]: detections_topic=/aruco/detections_json
+[INFO] [1778450006.262223057] [tag_localization]: tag_localization started
+[INFO] [1778450006.263178128] [tag_localization]: detections_topic=/aruco/detections_json
+[INFO] [1778450006.637899641] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450007.098467885] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450007.537207215] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450008.428340932] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450009.127817472] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450009.752069144] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450010.129959237] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450010.713285295] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450011.850398093] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450012.426076298] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450012.749967512] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450013.192757456] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450013.568664828] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450014.191263010] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450014.500103164] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450015.161934643] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450015.820270173] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450016.125868576] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450016.977348028] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450017.417480643] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450019.521722394] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450019.835448843] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450020.243248044] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450020.625069125] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450021.393575366] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450021.879461003] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450022.320380754] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450022.810626695] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450023.622916235] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450024.787767607] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450025.134847564] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450025.450174614] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450025.801188976] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450026.166503777] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450026.752657749] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450027.764718369] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450028.258246541] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450028.618996157] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450028.952097292] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450029.376865622] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450029.976623731] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450030.675947992] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450030.985267731] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450031.573517414] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450031.958745439] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450032.487698047] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450033.109109426] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450034.184147607] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450034.588053348] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450035.655983506] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450036.294078219] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450036.748853720] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450038.070163475] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450038.534248905] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450038.938951534] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450039.502620815] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450039.987434108] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450040.617995544] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450041.874514925] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450042.258500323] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450042.800829750] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450043.696146792] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450044.060076938] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450044.614467735] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450045.030770374] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450045.609188308] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450045.973759058] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450046.491862118] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450047.041723942] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450047.496251059] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450047.877919719] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450048.226335177] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450048.660068334] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450049.046912327] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450049.422741971] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450049.755027055] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450050.196032506] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450050.533966420] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450050.944768181] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450051.266870401] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450051.616102820] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450052.041811917] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450052.481836868] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450052.874950280] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450053.207194733] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450053.571851008] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450054.054296104] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450055.248772463] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450055.964630479] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450056.372717203] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450056.732163426] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450057.081515258] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450057.867053318] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450058.492682398] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450059.150540878] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450059.704673331] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450060.333151993] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450061.445092908] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450062.783241848] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450064.386358340] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450064.847548210] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450065.259778022] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450065.681081656] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450066.448977199] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450066.775849486] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450067.540327208] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450067.874124525] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450068.180686252] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450068.536637820] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450068.859642211] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450069.291532158] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450069.723090274] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450070.037204402] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450070.631505968] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450071.353334678] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450071.939375334] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450072.522119701] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450072.873451620] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450073.257802496] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450074.157678020] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450074.986831459] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450075.609586823] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450076.374742780] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450076.715163019] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450077.198155312] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450078.202150040] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450078.725558545] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450079.581387270] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450080.654756516] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450081.487191410] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450082.117925380] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450082.664614922] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[INFO] [1778450083.395781621] [tag_localization]: selected=Blue_close | visible=['Blue_close'] | bot_pose: x=2.733, y=1.849, yaw=-92.2 deg
+[ERROR] [1778450084.106751366] [tag_localization]: Localization failed: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:423
+Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:423
+Traceback (most recent call last):
+  File "/home/eurobot2026/Eurobot2026MTP/install/sondre_bot_control/lib/sondre_bot_control/tag_localization", line 33, in <module>
+    sys.exit(load_entry_point('sondre-bot-control', 'console_scripts', 'tag_localization')())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/eurobot2026/Eurobot2026MTP/build/sondre_bot_control/sondre_bot_control/tag_localization.py", line 239, in main
+    rclpy.shutdown()
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/__init__.py", line 134, in shutdown
+    _shutdown(context=context)
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/utilities.py", line 82, in shutdown
+    context.shutdown()
+  File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/context.py", line 129, in shutdown
+    self.__context.shutdown()
+rclpy._rclpy_pybind11.RCLError: failed to shutdown: rcl_shutdown already called on the given context, at ./src/rcl/init.c:333

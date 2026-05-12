@@ -1,6 +1,28 @@
+-------------------------------------------------------------------------------
+  # Check input voltage
+
+vcgencmd pmic_read_adc EXT5V_V
+
+-------------------------------------------------------------------------------
+  # Monitor CPU temp
+
+watch -n 1 'awk "{printf \"CPU temp: %.1f°C\n\", \$1/1000}" /sys/class/thermal/thermal_zone0/temp'
+
+-------------------------------------------------------------------------------
+  # Check for throttle
+
+sudo watch -n 1 'vcgencmd measure_temp; vcgencmd get_throttled'
+
+-------------------------------------------------------------------------------
+  # Monitor ALL
+
+watch -n 0.5 'vcgencmd pmic_read_adc EXT5V_V; vcgencmd get_throttled; vcgencmd measure_temp'
 
 
 -------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
   # Run bot system
 
 
@@ -44,7 +66,7 @@ source ~/sondre_bot_gz/install/setup.bash
 -------------------------------------------------------------------------------
   # Update github repo
 
-cd ~/sondre_ws
+cd ~/Eurobot2026MTP
 
 git status
 git add .
@@ -52,7 +74,7 @@ git commit -m "Update Eurobot2026MTP project"
 git branch -M main
 
 git remote remove origin 2>/dev/null
-git remote add origin git@github.com:SondrewiigEurobot2026MTP.git
+git remote add origin git@github.com:Sondrewiig/Eurobot2026MTP.git
 
 git pull origin main --allow-unrelated-histories
 git push -u origin main

@@ -50,6 +50,7 @@ setup(
             'stereo_capture = sondre_bot_control.stereo_capture:main',
             'stereo_calibrate = sondre_bot_control.stereo_calibrate:main',
             'stereo_rectify = sondre_bot_control.stereo_rectify:main',
+            "rbpi_metrics = sondre_bot_control.rbpi_metrics:main",
         ],
     },
 )

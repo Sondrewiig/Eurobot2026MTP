@@ -1,40 +1,35 @@
-[INFO] [1777301871.522532442] [v4l2_camera]: Driver: uvcvideo
-[INFO] [1777301871.523556751] [v4l2_camera]: Version: 395276
-[INFO] [1777301871.523927175] [v4l2_camera]: Device: ZED 2i: ZED 2i
-[INFO] [1777301871.524056211] [v4l2_camera]: Location: usb-xhci-hcd.0-1
-[INFO] [1777301871.524149729] [v4l2_camera]: Capabilities:
-[INFO] [1777301871.524253617] [v4l2_camera]:   Read/write: NO
-[INFO] [1777301871.524341302] [v4l2_camera]:   Streaming: YES
-[INFO] [1777301871.524446875] [v4l2_camera]: Current pixel format: YUYV @ 1344x376
-[INFO] [1777301871.526353901] [v4l2_camera]: Available pixel formats: 
-[INFO] [1777301871.526455974] [v4l2_camera]:   YUYV - YUYV 4:2:2
-[INFO] [1777301871.526478345] [v4l2_camera]: Available controls: 
-[INFO] [1777301871.526511085] [v4l2_camera]:   Brightness (1) = 1
-[INFO] [1777301871.526541567] [v4l2_camera]:   Contrast (1) = 8
-[INFO] [1777301871.526570066] [v4l2_camera]:   Saturation (1) = 4
-[INFO] [1777301871.526596677] [v4l2_camera]:   Hue (1) = 0 [inactive]
-[INFO] [1777301871.526626992] [v4l2_camera]:   White Balance, Automatic (2) = 0
-[INFO] [1777301871.527153063] [v4l2_camera]:   Red Balance (1) = 1024
-[INFO] [1777301871.527765504] [v4l2_camera]:   Blue Balance (1) = 1024
-[INFO] [1777301871.527817929] [v4l2_camera]:   Gamma (1) = 500
-[INFO] [1777301871.527842170] [v4l2_camera]:   Gain (1) = 1
-[INFO] [1777301871.527864151] [v4l2_camera]:   Power Line Frequency (3) = 1
-[INFO] [1777301871.528389796] [v4l2_camera]:   Hue, Automatic (2) = 1
-[INFO] [1777301871.529014459] [v4l2_camera]:   White Balance Temperature (1) = 3500
-[INFO] [1777301871.529050218] [v4l2_camera]:   Sharpness (1) = 4
-[INFO] [1777301871.530622468] [v4l2_camera]: Requesting format: 1344x376 MJPG
-[INFO] [1777301871.533767819] [v4l2_camera]: Success
-[INFO] [1777301871.533849097] [v4l2_camera]: Requesting format: 1920x540 YUYV
-[INFO] [1777301871.536898893] [v4l2_camera]: Success
-[INFO] [1777301871.538137404] [v4l2_camera]: Succesfully set value for control Gain to 4
-[INFO] [1777301871.538766623] [v4l2_camera]: Succesfully set value for control Gamma to 100
-[INFO] [1777301871.541262885] [v4l2_camera]: Succesfully set value for control White Balance, Automatic to 1
-[INFO] [1777301871.542517545] [v4l2_camera]: Succesfully set value for control Contrast to 4
-[INFO] [1777301871.543141671] [v4l2_camera]: Succesfully set value for control Sharpness to 0
-[INFO] [1777301871.543764222] [v4l2_camera]: Succesfully set value for control Brightness to 4
-[INFO] [1777301871.543790593] [v4l2_camera]: Starting camera
-[WARN] [1777301871.548503286] [v4l2_camera]: Image encoding not the same as requested output, performing possibly slow conversion: yuv422_yuy2 => rgb8
-[INFO] [1777301871.555449448] [v4l2_camera]: using default calibration URL
-[INFO] [1777301871.555653132] [v4l2_camera]: camera calibration URL: file:///home/eurobot2026/.ros/camera_info/zed_2i:_zed_2i.yaml
-[ERROR] [1777301871.555772002] [camera_calibration_parsers]: Unable to open camera calibration file [/home/eurobot2026/.ros/camera_info/zed_2i:_zed_2i.yaml]
-[WARN] [1777301871.555891409] [v4l2_camera]: Camera calibration file /home/eurobot2026/.ros/camera_info/zed_2i:_zed_2i.yaml not found
+[INFO] [1778449997.657261313] [v4l2_camera]: Driver: uvcvideo
+[INFO] [1778449997.657889996] [v4l2_camera]: Version: 395276
+[INFO] [1778449997.657944477] [v4l2_camera]: Device: ZED 2i: ZED 2i
+[INFO] [1778449997.657960570] [v4l2_camera]: Location: usb-xhci-hcd.1-1
+[INFO] [1778449997.657972644] [v4l2_camera]: Capabilities:
+[INFO] [1778449997.657992070] [v4l2_camera]:   Read/write: NO
+[INFO] [1778449997.658004366] [v4l2_camera]:   Streaming: YES
+[INFO] [1778449997.658023496] [v4l2_camera]: Current pixel format: YUYV @ 2560x720
+[INFO] [1778449997.658089403] [v4l2_camera]: Available pixel formats: 
+[INFO] [1778449997.658101366] [v4l2_camera]:   YUYV - YUYV 4:2:2
+[INFO] [1778449997.658112551] [v4l2_camera]: Available controls: 
+[INFO] [1778449997.658129458] [v4l2_camera]:   Brightness (1) = 4
+[INFO] [1778449997.658146125] [v4l2_camera]:   Contrast (1) = 4
+[INFO] [1778449997.658162514] [v4l2_camera]:   Saturation (1) = 4
+[INFO] [1778449997.658182236] [v4l2_camera]:   Hue (1) = 0 [inactive]
+[INFO] [1778449997.658202180] [v4l2_camera]:   White Balance, Automatic (2) = 1
+[INFO] [1778449997.661402891] [v4l2_camera]:   Red Balance (1) = 1024 [inactive]
+[INFO] [1778449997.662303184] [v4l2_camera]:   Blue Balance (1) = 1024 [inactive]
+[INFO] [1778449997.662457795] [v4l2_camera]:   Gamma (1) = 100
+[INFO] [1778449997.662531813] [v4l2_camera]:   Gain (1) = 4
+[INFO] [1778449997.662556942] [v4l2_camera]:   Power Line Frequency (3) = 1
+[INFO] [1778449997.663105626] [v4l2_camera]:   Hue, Automatic (2) = 1
+[INFO] [1778449997.663722846] [v4l2_camera]:   White Balance Temperature (1) = 4600 [inactive]
+[INFO] [1778449997.663786382] [v4l2_camera]:   Sharpness (1) = 0
+[INFO] [1778449997.667661942] [v4l2_camera]: Requesting format: 2560x720 MJPG
+[INFO] [1778449997.671605484] [v4l2_camera]: Success
+[INFO] [1778449997.671793798] [v4l2_camera]: Requesting format: 1920x540 YUYV
+[INFO] [1778449997.684989102] [v4l2_camera]: Success
+[INFO] [1778449997.686373005] [v4l2_camera]: Starting camera
+[WARN] [1778449997.908878574] [v4l2_camera]: Image encoding not the same as requested output, performing possibly slow conversion: yuv422_yuy2 => rgb8
+[INFO] [1778449997.968590082] [v4l2_camera]: using default calibration URL
+[INFO] [1778449997.968872636] [v4l2_camera]: camera calibration URL: file:///home/eurobot2026/.ros/camera_info/zed_2i:_zed_2i.yaml
+[ERROR] [1778449997.969134524] [camera_calibration_parsers]: Unable to open camera calibration file [/home/eurobot2026/.ros/camera_info/zed_2i:_zed_2i.yaml]
+[WARN] [1778449997.969482504] [v4l2_camera]: Camera calibration file /home/eurobot2026/.ros/camera_info/zed_2i:_zed_2i.yaml not found
+[INFO] [1778450083.781875852] [rclcpp]: signal_handler(SIGINT/SIGTERM)
