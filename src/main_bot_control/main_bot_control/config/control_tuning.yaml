@@ -1,0 +1,606 @@
+# Tuning values for main_bot_control/opencr_bridge_sim.py
+# Main idea: change ONLY base_speeds for global driving/turning speed.
+# All other speed limits are factors of those two base values.
+
+opencr_bridge_sim:
+  # Arena values are here on purpose. opencr_bridge_sim.py loads these
+  # instead of silently using hidden hardcoded target/field values.
+  field:
+    x_min_mm: 0.0
+    x_max_mm: 3000.0
+    y_min_mm: 0.0
+    y_max_mm: 2000.0
+
+  robot_geometry:
+    offset_axis_mm: 0.0
+    offset_center_mm: 66.0
+    offset_dustpan_mm: 336.0
+    bot_front_mm: 336.0
+    bot_rear_mm: 59.0
+    bot_half_width_mm: 150.0
+
+  # Pose source used by opencr_bridge_sim.py for actual driving.
+  # Keep this on /bot_pose_fused so the simulated bot drives on the same
+  # localization estimate you are developing, not fake Gazebo ground truth.
+  # Set to /bot_pose_ground_truth only for deliberate ideal-sim debugging.
+  localization:
+    drive_pose_topic: /bot_pose_fused
+    drive_pose_timeout_s: 0.50
+
+  # Opponent perimeter / avoidance decision tree.
+  # Perimeter dimensions are measured from the opponent bot body/tag frame:
+  #   front = bot_front_mm + opponent_front_margin_mm
+  #   rear  = bot_rear_mm  + opponent_rear_margin_mm
+  #   side  = bot_half_width_mm + opponent_side_margin_mm
+  avoidance:
+    enabled: true
+    enemy_pose_topic: /vision/enemy_pose
+    enemy_pose_timeout_s: 0.50
+    opponent_front_margin_mm: 50.0
+    opponent_rear_margin_mm: 200.0
+    opponent_side_margin_mm: 200.0
+
+    # Decision tree for what the bot does when its own perimeter overlaps
+    # the opponent perimeter above.
+    decision_tree:
+      # Branch 1: what to do while our own bot perimeter overlaps
+      # the opponent perimeter.
+      #   stop   = hold position and continue same goal when clear
+      #   escape = turn away from the opponent center, then creep forward until clear
+      inside_perimeter: stop
+
+      # Branch 2: what to do after we are outside the opponent perimeter,
+      # but the current active goal/waypoint is still inside it.
+      #   hold   = wait outside until the opponent moves away
+      #   ignore = resume normal driving even if the target is blocked
+      goal_inside_perimeter: hold
+
+      stop:
+        publish_error: true
+
+      hold:
+        publish_error: false
+
+      escape:
+        linear_mm_s: 80.0
+        max_yaw_rad_s: 0.45
+        yaw_gain: 1.5
+        yaw_tolerance_deg: 15.0
+
+
+  # Match-time safety stop. Uses ROS/Gazebo simulation time when use_sim_time=True.
+  # At this sim-time value, the sim bridge aborts strategy/mission/drive and
+  # sends a full stop to motors/roller/actuators.
+
+  # Team-side selection.
+  # yellow = normal coordinates as written below.
+  # blue   = mirror all autonomous targets across x = mirror_line_x_mm.
+  team:
+    color: yellow      # yellow or blue
+    mirror_line_x_mm: 1500.0
+    spawn:
+      yellow: {x_mm: 300.0, y_mm: 1800.0, yaw_deg: -90.0}
+      blue:   {x_mm: 2700.0, y_mm: 1800.0, yaw_deg: -90.0}
+
+    # Top ArUco tags for robot/opponent identification in sim.
+    # Blue robots must use IDs 1-5. Yellow robots must use IDs 6-10.
+    # sim.launch.py latches these to team.color:
+    #   team.color=blue   -> active bot uses active_blue_id, dummy uses dummy_yellow_id
+    #   team.color=yellow -> active bot uses active_yellow_id, dummy uses dummy_blue_id
+    aruco_tags:
+      active_blue_id: 1
+      active_yellow_id: 6
+      dummy_blue_id: 2
+      dummy_yellow_id: 7
+
+  match_timer:
+    enabled: true
+    stop_all_at_s: 100.0
+
+  jenga_zones:
+    locations:
+      1: [175.0, 1200.0]
+      2: [175.0, 380.0]
+      3: [1150.0, 800.0]
+      4: [1100.0, 175.0]
+      5: [1850.0, 800.0]
+      6: [1900.0, 175.0]
+      7: [2825.0, 1200.0]
+      8: [2825.0, 400.0]
+
+
+    # Fine-tune where the dustpan/front should actually pick up pieces.
+    # Offsets are FIELD coordinates in millimetres: +x right, +y top.
+    # Actual pickup target = locations[id] + target_offsets_mm[id].
+    target_offsets_mm:
+      1: [0.0, 50.0]
+      2: [0.0, 70.0]
+      3: [-20.0, 0.0]
+      4: [-30.0, 0.0]
+      5: [0.0, 0.0]
+      6: [0.0, 0.0]
+      7: [0.0, 0.0]
+      8: [0.0, 0.0]
+
+    approach_yaws_deg:
+      1: 180.0
+      2: 180.0
+      3: -90.0
+      4: -90.0
+      5: -90.0
+      6: -90.0
+      7: 0.0
+      8: 0.0
+
+    forced_highway_exit:
+      1: [500.0, 1200.0]
+      2: [500.0, 400.0]
+      3: [1150.0, 1200.0]
+      5: [1850.0, 1200.0]
+      7: [2500.0, 1200.0]
+      8: [2500.0, 400.0]
+
+  pantries:
+    half_size_mm: 100.0
+
+    locations:
+      1: [1250.0, 1450.0]
+      2: [1750.0, 1450.0]
+      3: [100.0, 800.0]
+      4: [800.0, 800.0]
+      5: [1500.0, 800.0]
+      6: [2200.0, 800.0]
+      7: [2900.0, 800.0]
+      8: [700.0, 100.0]
+      9: [1500.0, 100.0]
+      10: [2300.0, 100.0]
+
+
+    # Fine-tune where the dustpan/front should actually place pieces.
+    # Offsets are FIELD coordinates in millimetres: +x right, +y top.
+    # Actual placement target = locations[id] + target_offsets_mm[id].
+    target_offsets_mm:
+      1: [0.0, 0.0]
+      2: [0.0, 0.0]
+      3: [0.0, 70.0]
+      4: [0.0, 0.0]
+      5: [0.0, 0.0]
+      6: [0.0, 0.0]
+      7: [0.0, 0.0]
+      8: [0.0, 0.0]
+      9: [0.0, 0.0]
+      10: [0.0, 0.0]
+
+    approach_yaws_deg:
+      1: 90.0
+      2: 90.0
+      3: 180.0
+      4: -90.0
+      5: -90.0
+      6: -90.0
+      7: 0.0
+      8: -90.0
+      9: -90.0
+      10: -90.0
+
+    forced_highway_exit:
+      1: [1250.0, 1200.0]
+      2: [1750.0, 1200.0]
+      3: [500.0, 800.0]
+      7: [2500.0, 800.0]
+
+  # ═══════════════════════════════════════════════════════════════
+  #  BASE SPEEDS — the two master knobs
+  # ═══════════════════════════════════════════════════════════════
+  # Every other speed in the system is a fraction of these two values.
+  # To make the whole bot faster/slower, change ONLY these.
+  base_speeds:
+    linear_mm_s: 400.0    # Max forward speed (mm/s). All linear speeds scale from this.
+    yaw_rad_s: 2.0        # Max rotation speed (rad/s). All yaw speeds scale from this.
+                           # Was 4.0 — halved because fused pose updates at ~20Hz.
+                           # At 4 rad/s the bot overshoots by ~12° per stale cycle.
+
+  # ═══════════════════════════════════════════════════════════════
+  #  DRIVE RESPONSE — how k_rho is auto-computed
+  # ═══════════════════════════════════════════════════════════════
+  drive_response:
+    auto_k_rho_from_base_speed: false    # If true, k_rho = linear_mm_s / reach_base_speed_dist_mm
+    reach_base_speed_dist_mm: 200.0     # Distance (mm) at which the bot reaches full base speed.
+                                         # k_rho = 400 / 300 = 1.33
+                                         # Larger → gentler approach, smaller → more aggressive.
+
+  # ═══════════════════════════════════════════════════════════════
+  #  SPEED FACTORS — fractions of base_speeds for each situation
+  # ═══════════════════════════════════════════════════════════════
+  # actual_speed = base_speed * factor
+  speed_factors:
+    # --- Global caps ---
+    max_linear: 1.00          # Forward cap:  400 * 1.00 = 400 mm/s
+    max_reverse: 0.65         # Reverse cap:  400 * 0.65 = 260 mm/s
+    max_yaw: 1.00             # Yaw cap:      2.0 * 1.00 = 2.0 rad/s
+
+    # --- Highway driving ---
+    highway: 0.75             # Cruise:       400 * 0.75 = 300 mm/s
+    highway_entry_exit: 0.55  # Entry/exit:   400 * 0.55 = 220 mm/s
+    highway_turn: 0.30        # Turning:      400 * 0.30 = 120 mm/s
+    highway_corner: 0.30      # Corner arcs:  400 * 0.30 = 120 mm/s
+
+    # --- Zone/pantry final straight approach ---
+    zone_straight: 0.30       # Zone push:    400 * 0.30 = 120 mm/s
+    zone_straight_min: 0.06   # Zone creep:   400 * 0.06 =  24 mm/s
+    pantry_straight: 0.25     # Pantry push:  400 * 0.25 = 100 mm/s
+    pantry_straight_min: 0.06 # Pantry creep: 400 * 0.06 =  24 mm/s
+
+    # --- Correction reverses ---
+    zone_correction_reverse: 0.10    # 400 * 0.10 = 40 mm/s
+    pantry_correction_reverse: 0.10  # 400 * 0.10 = 40 mm/s
+
+    # --- Other linear ---
+    home_reverse: 0.30        # Reverse into home:  400 * 0.30 = 120 mm/s
+    mission_backup: 0.20      # Post-pickup backup: 400 * 0.20 =  80 mm/s
+
+    # --- Yaw alignment speeds (fractions of yaw_rad_s) ---
+    #   Used by _rotate_toward_yaw during ALIGN_FOR_APPROACH and ALIGN_FINAL_YAW.
+    final_yaw_max: 0.40       # Rotation cap:   2.0 * 0.40 = 0.80 rad/s (46°/s)
+    final_yaw_min: 0.04       # Friction floor:  2.0 * 0.04 = 0.08 rad/s (4.6°/s)
+
+    # --- Actuators ---
+    dustpan_move: 1.00
+    carwash_arm_move: 1.00
+    roller_pull: 3.33
+    roller_push: 3.33
+    roller_accel: 16.67
+
+  # ═══════════════════════════════════════════════════════════════
+  #  ACCELERATION FACTORS — command ramping in _drive_vw
+  # ═══════════════════════════════════════════════════════════════
+  # These control how fast the commanded speed ramps up/down each tick.
+  # actual_accel = base_speed * factor_per_s
+  # Lower = smoother but slower response. Higher = snappier but riskier overshoot.
+  acceleration_factors:
+    linear_accel_per_s: 1.5   # Fwd spin-up:  400 * 1.0 = 400 mm/s²  (1.0s to full speed)
+    linear_decel_per_s: 4.0   # Fwd braking:  400 * 3.0 = 1200 mm/s² (0.33s to stop)
+    yaw_accel_per_s: 0.5      # Yaw spin-up:  2.0 * 0.5 = 1.0 rad/s² (2.0s to full yaw)
+                               # Was 1.0 — halved to prevent overshoot with 20Hz pose.
+    yaw_decel_per_s: 3.0      # Yaw braking:  2.0 * 3.0 = 6.0 rad/s² (0.33s to stop)
+
+  # ═══════════════════════════════════════════════════════════════
+  #  DRIVE GAINS — point-to-point controller in _drive_toward_xy
+  # ═══════════════════════════════════════════════════════════════
+  #   linear_cmd = k_rho * distance * cos(heading_error)
+  #   yaw_cmd    = k_alpha * heading_error + k_alpha_i * integral(heading_error)
+  #                - k_yaw_d * imu_gyro_z
+  drive_gains:
+    k_rho: 2.5               # P-gain on distance → linear speed.
+                               # Overridden by auto_k_rho if enabled (see drive_response).
+                               # Higher = faster approach, lower = gentler.
+
+    k_alpha: 0.8              # P-gain on heading error → yaw speed while driving.
+                               # Higher = sharper steering, lower = wider arcs.
+                               # Was 1.0 — reduced for noisy fused pose.
+
+    k_alpha_i: 0.3            # I-gain on heading error → corrects persistent drift.
+                               # Higher = more correction, but oscillates with noisy pose.
+                               # Was 1.0 — reduced significantly to prevent oscillation.
+
+    alpha_i_limit: 0.5        # Clamp on integral accumulator (radians).
+                               # Prevents windup when heading error stays large.
+                               # Was 1.0 — tightened to match lower k_alpha_i.
+
+    k_yaw_d: 0.3              # D-gain on yaw rate from IMU gyro (rad/s → counter-torque).
+                               # Damps rotation using 200Hz IMU feedback, preventing
+                               # overshoot caused by the slow 20Hz pose estimate.
+                               # 0.0 = no damping (old behavior), 0.3 = moderate damping.
+                               # Applied in _drive_toward_xy, _rotate_toward_yaw,
+                               # and _drive_zone_straight_waypoint.
+
+  # ═══════════════════════════════════════════════════════════════
+  #  GOAL TOLERANCES — when to declare "arrived"
+  # ═══════════════════════════════════════════════════════════════
+  goal_tolerances:
+    position_mm: 35.0         # Within this distance (mm) → goal reached.
+    final_yaw_deg: 2.0        # Within this angle (deg) → yaw alignment done.
+                               # (used by ALIGN_FINAL_YAW between highway waypoints)
+
+  # ═══════════════════════════════════════════════════════════════
+  #  FINAL YAW — pure rotation controller in _rotate_toward_yaw
+  # ═══════════════════════════════════════════════════════════════
+  #   yaw_cmd = k * yaw_error, clamped to [final_yaw_min, final_yaw_max]
+  final_yaw:
+    k: 1.2                    # P-gain on yaw error → rotation speed.
+                               # Higher = snappier turns, but overshoots with slow pose.
+
+    hold_s: 0.15              # Must stay within tolerance for this long (seconds)
+                               # before declaring settled. Prevents false positives
+                               # from noisy pose bouncing in/out of the dead band.
+
+    tolerance_deg: 5.0        # Dead band (deg). Stop rotating when |error| < this.
+
+  highway:
+    use_highway_planner: true
+    use_highway_for_home: true
+
+    x_lines_mm: [500.0, 2500.0]
+    y_lines_mm: [400.0, 1200.0]
+
+    outer_x_min_mm: 450.0
+    outer_x_max_mm: 2550.0
+    outer_y_min_mm: 350.0
+    outer_y_max_mm: 1250.0
+
+    inner_x_min_mm: 550.0
+    inner_x_max_mm: 2450.0
+    inner_y_min_mm: 550.0
+    inner_y_max_mm: 1050.0
+
+    min_direct_dist_mm: 250.0
+    duplicate_tolerance_mm: 25.0
+    pass_through_radius_mm: 110.0
+    straight_angle_tolerance_deg: 15.0
+
+    overshoot_cross_track_mm: 110.0
+    behind_skip_dist_mm: 220.0
+    behind_skip_angle_deg: 145.0
+
+    entry_selection_slack_mm: 180.0
+
+    smooth_turn_aggressive_deg: 0.0
+    smooth_turn_conservative_deg: 55.0
+
+    corner_cut_enabled: true
+    corner_cut_dist_mm: 180.0
+    corner_cut_min_seg_mm: 220.0
+    corner_cut_min_angle_deg: 30.0
+    corner_cut_max_angle_deg: 120.0
+    corner_arc_points: 3
+    corner_pass_radius_mm: 120.0
+    corner_pass_angle_deg: 60.0
+    corner_safety_margin_mm: 0.0
+
+  approach_point:
+    offset_mm: 300.0
+    min_dist_mm: 150.0
+
+  reverse:
+    enabled: true
+    max_dist_mm: 500.0
+    heading_threshold_deg: 100.0
+
+  zone_approach:
+    backup_mm: 150.0
+    start_mm: 150.0
+    min_align_standoff_mm: 150.0
+    prefer_forward_start: true
+    forbidden_margin_mm: 0.0
+    straight_yaw_tolerance_deg: 5.0
+    correction_reverse_enabled: false
+
+  pantry_approach:
+    backup_mm: 0.0
+    start_mm: 100.0
+    min_align_standoff_mm: 100.0
+    prefer_forward_start: true
+    correction_reverse_enabled: false
+
+  home:
+    x_mm: 300.0
+    y_mm: 1700.0
+    yaw_deg: 90.0
+    staging_offset_mm: 600.0
+
+  boundary_slowdown:
+    slowdown_dist_mm: 100.0
+    min_speed_fraction: 0.3
+
+  dustpan:
+    up_angle_deg: 60.0
+    down_angle_deg: -0.5
+    lower_settle_s: 2.5
+
+  carwash:
+    arm_up_angle_deg: 70.0
+    arm_down_angle_deg: -0.5
+    roller_stop_rad_s: 0.0
+
+  mission:
+    carwash_pull_time_s: 2.5
+    carwash_push_time_s: 3.0
+    settle_time_s: 0.5
+    backup_dist_mm: 200.0
+
+  strategies:
+      strategy_1:
+        finish:
+          carwash: stow
+          dustpan: up
+        steps:
+          - action: drive_path
+            label: START_FORWARD_300_STRATEGY
+            waypoints:
+              - {x_mm: 550.0, y_mm: 1250.0, yaw_deg: -20.0, ref: axis}
+          - action: zone
+            id: 3
+            start_mm: 140.0
+          - action: pull
+          - action: pantry
+            id: 4
+            yaw_deg: 180.0
+            start_mm: 0.0
+          - action: push
+          - action: zone
+            id: 4
+            start_mm: 140.0
+          - action: pull
+          - action: pantry
+            id: 8
+            start_mm: 0.0
+          - action: push
+          - action: zone
+            id: 2
+            start_mm: 140.0
+          - action: pull
+          - action: pantry
+            id: 3
+            start_mm: 15.0
+          - action: push
+          - action: home
+          - action: settle
+            duration_s: 0.5
+
+      strategy_2:
+        finish:
+          carwash: stow
+          dustpan: up
+        steps:
+          - action: drive_path
+            label: START_FORWARD_300_STRATEGY
+            waypoints:
+              - {x_mm: 550.0, y_mm: 1250.0, yaw_deg: -20.0, ref: axis}
+          - action: zone
+            id: 1
+            start_mm: 140.0
+          - action: pull
+
+          - action: pantry
+            id: 3
+            yaw_deg: 180.0
+            start_mm: 0.0
+          - action: push
+
+          - action: zone
+            id: 2
+            start_mm: 100.0
+          - action: pull
+
+          - action: pantry
+            id: 8
+            start_mm: 0.0
+          - action: push
+
+          - action: zone
+            id: 4
+            start_mm: 140.0
+          - action: pull
+
+          - action: pantry
+            id: 9
+            start_mm: 15.0
+          - action: push
+
+          - action: zone
+            id: 6
+            start_mm: 100.0
+          - action: pull
+
+          - action: pantry
+            id: 9
+            start_mm: 0.0
+          - action: push
+
+          - action: home
+          - action: settle
+            duration_s: 0.5
+
+      strategy_3:
+        finish:
+          carwash: stow
+          dustpan: up
+        steps:
+          - action: drive_path
+            label: START_FORWARD_300_STRATEGY
+            waypoints:
+              - {x_mm: 550.0, y_mm: 1250.0, yaw_deg: -20.0, ref: axis}
+          - action: zone
+            id: 3
+            start_mm: 140.0
+          - action: pull
+          - action: pantry
+            id: 4
+            yaw_deg: 180.0
+            start_mm: 0.0
+          - action: push
+          - action: zone
+            id: 4
+            start_mm: 140.0
+          - action: pull
+          - action: pantry
+            id: 8
+            start_mm: 0.0
+          - action: push
+          - action: zone
+            id: 2
+            start_mm: 140.0
+          - action: pull
+          - action: pantry
+            id: 3
+            start_mm: 15.0
+          - action: push
+          - action: dustpan_up
+
+          - action: drive_path
+            label: LINE_UP_PUSH
+            waypoints:
+              - {x_mm: 550.0, y_mm: 1300.0, yaw_deg: 180.0, ref: axis}
+
+          - action: drive_path
+            label: REVERSE_PUSH
+            waypoints:
+              - {x_mm: 1200.0, y_mm: 1300.0, yaw_deg: 180.0, reverse: true, ref: axis}
+
+          - action: drive_path
+            label: RETURN_HOME
+            waypoints:
+              - {x_mm: 400.0, y_mm: 1300.0, yaw_deg: 180.0, ref: axis}
+            
+          - action: home
+          - action: settle
+            duration_s: 0.5
+
+
+
+      strategy_0:
+        finish:
+          carwash: stow
+          dustpan: up
+        steps:
+          - action: drive_path
+            label: START_FORWARD
+            waypoints:
+              - {x_mm: 550.0, y_mm: 1250.0, yaw_deg: -90.0, ref: axis}
+          - action: drive_path
+            label: CORNER_1
+            waypoints:
+              - {x_mm: 550.0, y_mm: 500.0, yaw_deg: 0.0, ref: axis}
+          - action: drive_path
+            label: CORNER_2
+            waypoints:
+              - {x_mm: 2450.0, y_mm: 500.0, yaw_deg: 90.0, ref: axis}
+          - action: drive_path
+            label: CORNER_3
+            waypoints:
+              - {x_mm: 2450.0, y_mm: 1250.0, yaw_deg: 90.0, ref: axis}
+          - action: drive_path
+            label: CORNER_4
+            waypoints:
+              - {x_mm: 550.0, y_mm: 1250.0, yaw_deg: 180.0, ref: axis}
+          - action: home
+          - action: settle
+            duration_s: 0.5
+
+
+
+  gazebo_reference:
+    # These still live in building_robot.sdf unless the SDF is made launch-generated.
+    diff_drive:
+      max_linear_velocity_m_s: 3.0
+      max_linear_acceleration_m_s2: 2.0
+      max_angular_velocity_rad_s: 2.0
+      max_angular_acceleration_rad_s2: 3.0
+    dustpan_position_controller:
+      p_gain: 3.0
+      i_gain: 0.1
+      d_gain: 1.5
+    carwash_arm_position_controller:
+      p_gain: 5.0
+      i_gain: 0.1
+      d_gain: 1.0

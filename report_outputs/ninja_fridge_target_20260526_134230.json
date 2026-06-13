@@ -1,0 +1,255 @@
+{
+  "active": true,
+  "actor": "ninja",
+  "target_type": "fridge_pair",
+  "reason": "ok",
+  "robot": {
+    "aruco_id": 55,
+    "kind": "own_ninja",
+    "team_relation": "own",
+    "x_mm": 2334.8,
+    "y_mm": 1902.8,
+    "world_validation": "ok",
+    "tag_center_x_mm": 2373.4,
+    "tag_center_y_mm": 1892.6,
+    "x_floor_projection_mm": 2461.6,
+    "y_floor_projection_mm": 1864.3,
+    "tag_height_mm": 200.0,
+    "heading_deg": 180.4,
+    "heading_note": "ArUco top-edge direction; align tag top edge with robot forward direction",
+    "size_px": 82.0,
+    "body_center_source": "tag_center_plus_ninja_offset",
+    "ninja_tag_from_rear_mm": 31.5,
+    "ninja_tag_lateral_offset_mm": 10.5,
+    "tag_forward_offset_to_body_center_mm": 38.5,
+    "tag_lateral_offset_to_body_center_mm": -10.5,
+    "offset_convention": "heading=forward; positive lateral tag offset means tag is left of body center",
+    "visible_this_frame": true,
+    "missed_frames": 0,
+    "seen_count": 904,
+    "confidence": 20,
+    "last_seen_frame": 1754,
+    "smoothed": true
+  },
+  "selected_fridge": {
+    "rank": 1,
+    "actor": "ninja",
+    "target_type": "fridge_pair",
+    "fridge_id": "blue_f1",
+    "fridge_team": "blue",
+    "own_team_fridge": true,
+    "known_fridge_center": {
+      "x_mm": 1900.0,
+      "y_mm": 1725.0
+    },
+    "pickup_center": {
+      "x_mm": 1912.5,
+      "y_mm": 1719.3,
+      "meaning": "two_detected_crates_midpoint",
+      "confidence": "high"
+    },
+    "detected_crates_near_fridge": 2,
+    "used_crates": [
+      {
+        "track_id": 31,
+        "aruco_id": 36,
+        "crate_type": "blue",
+        "x_mm": 1886.9,
+        "y_mm": 1717.0,
+        "long_axis_deg": 88.6
+      },
+      {
+        "track_id": 32,
+        "aruco_id": 47,
+        "crate_type": "yellow",
+        "x_mm": 1938.0,
+        "y_mm": 1721.7,
+        "long_axis_deg": 269.3
+      }
+    ],
+    "approach_pose": {
+      "x_mm": 1912.5,
+      "y_mm": 1859.3,
+      "heading_deg": -90.0,
+      "target_reference": "fridge_pair_midpoint_or_known_center",
+      "valid_for_ninja_body": true,
+      "ninja_body_reason": "ok"
+    },
+    "distance_to_approach_mm": 424.5,
+    "selection_method": "fridge_pair_midpoint_or_known_center_for_ninja_v1"
+  },
+  "pickup_center": {
+    "x_mm": 1912.5,
+    "y_mm": 1719.3,
+    "meaning": "two_detected_crates_midpoint",
+    "confidence": "high"
+  },
+  "approach_pose": {
+    "x_mm": 1912.5,
+    "y_mm": 1859.3,
+    "heading_deg": -90.0,
+    "target_reference": "fridge_pair_midpoint_or_known_center",
+    "valid_for_ninja_body": true,
+    "ninja_body_reason": "ok"
+  },
+  "queue_length": 4,
+  "top_candidates": [
+    {
+      "rank": 1,
+      "actor": "ninja",
+      "target_type": "fridge_pair",
+      "fridge_id": "blue_f1",
+      "fridge_team": "blue",
+      "own_team_fridge": true,
+      "known_fridge_center": {
+        "x_mm": 1900.0,
+        "y_mm": 1725.0
+      },
+      "pickup_center": {
+        "x_mm": 1912.5,
+        "y_mm": 1719.3,
+        "meaning": "two_detected_crates_midpoint",
+        "confidence": "high"
+      },
+      "detected_crates_near_fridge": 2,
+      "used_crates": [
+        {
+          "track_id": 31,
+          "aruco_id": 36,
+          "crate_type": "blue",
+          "x_mm": 1886.9,
+          "y_mm": 1717.0,
+          "long_axis_deg": 88.6
+        },
+        {
+          "track_id": 32,
+          "aruco_id": 47,
+          "crate_type": "yellow",
+          "x_mm": 1938.0,
+          "y_mm": 1721.7,
+          "long_axis_deg": 269.3
+        }
+      ],
+      "approach_pose": {
+        "x_mm": 1912.5,
+        "y_mm": 1859.3,
+        "heading_deg": -90.0,
+        "target_reference": "fridge_pair_midpoint_or_known_center",
+        "valid_for_ninja_body": true,
+        "ninja_body_reason": "ok"
+      },
+      "distance_to_approach_mm": 424.5,
+      "selection_method": "fridge_pair_midpoint_or_known_center_for_ninja_v1"
+    },
+    {
+      "rank": 2,
+      "actor": "ninja",
+      "target_type": "fridge_pair",
+      "fridge_id": "blue_f2",
+      "fridge_team": "blue",
+      "own_team_fridge": true,
+      "known_fridge_center": {
+        "x_mm": 1650.0,
+        "y_mm": 1775.0
+      },
+      "pickup_center": {
+        "x_mm": 1658.5,
+        "y_mm": 1772.5,
+        "meaning": "two_detected_crates_midpoint",
+        "confidence": "high"
+      },
+      "detected_crates_near_fridge": 2,
+      "used_crates": [
+        {
+          "track_id": 33,
+          "aruco_id": 47,
+          "crate_type": "yellow",
+          "x_mm": 1632.1,
+          "y_mm": 1769.1,
+          "long_axis_deg": 270.1
+        },
+        {
+          "track_id": 34,
+          "aruco_id": 36,
+          "crate_type": "blue",
+          "x_mm": 1685.0,
+          "y_mm": 1776.0,
+          "long_axis_deg": 269.2
+        }
+      ],
+      "approach_pose": {
+        "x_mm": 1658.5,
+        "y_mm": 1912.5,
+        "heading_deg": -90.0,
+        "target_reference": "fridge_pair_midpoint_or_known_center",
+        "valid_for_ninja_body": true,
+        "ninja_body_reason": "ok"
+      },
+      "distance_to_approach_mm": 676.4,
+      "selection_method": "fridge_pair_midpoint_or_known_center_for_ninja_v1"
+    },
+    {
+      "rank": 3,
+      "actor": "ninja",
+      "target_type": "fridge_pair",
+      "fridge_id": "yellow_f2",
+      "fridge_team": "yellow",
+      "own_team_fridge": false,
+      "known_fridge_center": {
+        "x_mm": 1350.0,
+        "y_mm": 1775.0
+      },
+      "pickup_center": {
+        "x_mm": 1350.0,
+        "y_mm": 1775.0,
+        "meaning": "known_fridge_center_fallback",
+        "confidence": "fallback"
+      },
+      "detected_crates_near_fridge": 0,
+      "used_crates": [],
+      "approach_pose": {
+        "x_mm": 1350.0,
+        "y_mm": 1915.0,
+        "heading_deg": -90.0,
+        "target_reference": "fridge_pair_midpoint_or_known_center",
+        "valid_for_ninja_body": true,
+        "ninja_body_reason": "ok"
+      },
+      "distance_to_approach_mm": 984.9,
+      "selection_method": "fridge_pair_midpoint_or_known_center_for_ninja_v1"
+    },
+    {
+      "rank": 4,
+      "actor": "ninja",
+      "target_type": "fridge_pair",
+      "fridge_id": "yellow_f1",
+      "fridge_team": "yellow",
+      "own_team_fridge": false,
+      "known_fridge_center": {
+        "x_mm": 1100.0,
+        "y_mm": 1725.0
+      },
+      "pickup_center": {
+        "x_mm": 1100.0,
+        "y_mm": 1725.0,
+        "meaning": "known_fridge_center_fallback",
+        "confidence": "fallback"
+      },
+      "detected_crates_near_fridge": 0,
+      "used_crates": [],
+      "approach_pose": {
+        "x_mm": 1100.0,
+        "y_mm": 1865.0,
+        "heading_deg": -90.0,
+        "target_reference": "fridge_pair_midpoint_or_known_center",
+        "valid_for_ninja_body": true,
+        "ninja_body_reason": "ok"
+      },
+      "distance_to_approach_mm": 1235.4,
+      "selection_method": "fridge_pair_midpoint_or_known_center_for_ninja_v1"
+    }
+  ],
+  "selection_method": "fridge_pair_midpoint_or_known_center_for_ninja_v1",
+  "old_single_crate_topics_unchanged": true,
+  "distance_to_approach_mm": 424.5
+}

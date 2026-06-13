@@ -1,6 +1,0 @@
-/**:
-  ros__parameters:
-    video_device: "/dev/video0"
-    pixel_format: "MJPG"
-    image_size: [1920, 540]
-    time_per_frame: [1, 30]

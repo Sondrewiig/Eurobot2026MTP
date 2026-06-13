@@ -1,0 +1,9 @@
+camera_controls:
+  white_balance_automatic: 0
+  white_balance_temperature: 3500
+  brightness: 1.25
+  contrast: 8
+  gain: 1.5
+  gamma: 500
+  sharpness: 4
+  

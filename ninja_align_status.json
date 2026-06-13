@@ -1,0 +1,50 @@
+{
+    "ok": true,
+    "mode": "pair",
+    "profile": "forward",
+    "detected_orientation": "forward",
+    "action": "APPROACH_PAIR",
+    "center_error_corrected_px": -7.875,
+    "size_error_px": 28.02761611938476,
+    "separation_error_px": -28.75,
+    "center_ready": true,
+    "size_ready": false,
+    "separation_ready": true,
+    "current": {
+        "pair_center_error_px": -15.125,
+        "pair_size_px": 115.57238388061523,
+        "pair_separation_px": 290.25
+    },
+    "target": {
+        "expected_left_id": 47,
+        "expected_right_id": 36,
+        "center": -7.25,
+        "separation": 319.0,
+        "size": 143.6
+    },
+    "tolerances": {
+        "center_px": 35.0,
+        "size_px": 8.0,
+        "separation_px": 30.0
+    },
+    "cmd": {
+        "linear_x": 0.03,
+        "angular_z": 0.0
+    },
+    "shaped_cmd": {
+        "linear_x": 0.03,
+        "angular_z": 0.0
+    },
+    "pulse": {
+        "pulse_control": true,
+        "state": "idle",
+        "kind": "stop",
+        "remaining_s": 0.0,
+        "cooldown_remaining_s": 0.0
+    },
+    "gate": {
+        "enable_motion": false,
+        "runtime_enabled": false,
+        "would_drive": false
+    }
+}

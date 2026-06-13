@@ -1,0 +1,20 @@
+=== Clean overhead coordinate snapshot ===
+
+Robots
+  object  id  x [mm]  y [mm]    theta  topic/source
+   Ninja  55  2336.5  1904.3  -179.6°   /ninja/pose
+
+Stable crate/Jenga coordinates (0 objects)
+  No objects found
+
+Useful planner/target output
+  No objects found
+
+NOTE: Enemy bot ID6 was not found. Check marker visibility and team-side/opponent settings.
+
+Saved evidence files:
+  evidence/ninja_pose_20260526_132807.txt
+  evidence/opponent_robots_20260526_132807.json
+  evidence/world_state_20260526_132807.json
+  evidence/overhead_snapshot_20260526_132807.txt
+  evidence/overhead_crates_20260526_132807.csv

@@ -1,0 +1,193 @@
+{
+  "active": true,
+  "actor": "main_bot",
+  "reason": "ok",
+  "robot": {
+    "aruco_id": 1,
+    "kind": "own_official_robot",
+    "team_relation": "own",
+    "x_mm": 2265.2,
+    "y_mm": 719.1,
+    "world_validation": "ok",
+    "tag_center_x_mm": 2265.2,
+    "tag_center_y_mm": 719.1,
+    "x_floor_projection_mm": 2408.4,
+    "y_floor_projection_mm": 353.0,
+    "tag_height_mm": 350.0,
+    "heading_deg": 178.6,
+    "heading_note": "ArUco top-edge direction; align tag top edge with robot forward direction",
+    "size_px": 111.2,
+    "top_plate_color_mode": "mdf",
+    "top_plate_color_note": "current test box is MDF/wood; future main bot expected black",
+    "body_center_source": "tag_center_assumed_centered",
+    "tag_forward_offset_to_body_center_mm": 0.0,
+    "tag_lateral_offset_to_body_center_mm": 0.0,
+    "visible_this_frame": true,
+    "missed_frames": 0,
+    "seen_count": 61,
+    "confidence": 20,
+    "last_seen_frame": 2024,
+    "smoothed": true
+  },
+  "target_crate": {
+    "track_id": 41,
+    "aruco_id": 47,
+    "crate_type": "yellow",
+    "x_mm": 1816.6,
+    "y_mm": 804.7,
+    "long_axis_deg": 88.3
+  },
+  "approach_pose": {
+    "name": "end_a_110",
+    "x_mm": 1813.3,
+    "y_mm": 694.7,
+    "heading_deg": 88.3,
+    "approach_distance_mm": 110.0,
+    "valid_for_main_bot": true,
+    "main_bot_reason": "ok",
+    "valid_for_ninja": false,
+    "ninja_reason": "ninja_body_outside_granary_forbidden"
+  },
+  "distance_to_approach_mm": 452.6,
+  "heading_error_deg": -90.3,
+  "selection_method": "nearest_valid_approach_pose_one_per_crate_hysteresis_v2",
+  "queue_length": 19,
+  "top_candidates": [
+    {
+      "rank": 1,
+      "actor": "main_bot",
+      "target_crate": {
+        "track_id": 49,
+        "aruco_id": 36,
+        "crate_type": "blue",
+        "x_mm": 1916.8,
+        "y_mm": 804.5,
+        "long_axis_deg": 90.0
+      },
+      "approach_pose": {
+        "name": "end_a_110",
+        "x_mm": 1916.8,
+        "y_mm": 694.5,
+        "heading_deg": 90.0,
+        "approach_distance_mm": 110.0,
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "valid_for_ninja": false,
+        "ninja_reason": "ninja_body_outside_granary_forbidden"
+      },
+      "distance_to_approach_mm": 349.3,
+      "heading_error_deg": -88.6,
+      "selection_method": "nearest_valid_approach_pose_one_per_crate_v2",
+      "all_valid_approaches_considered": 84
+    },
+    {
+      "rank": 2,
+      "actor": "main_bot",
+      "target_crate": {
+        "track_id": 52,
+        "aruco_id": 36,
+        "crate_type": "blue",
+        "x_mm": 1864.8,
+        "y_mm": 802.0,
+        "long_axis_deg": 90.7
+      },
+      "approach_pose": {
+        "name": "end_a_110",
+        "x_mm": 1866.1,
+        "y_mm": 692.0,
+        "heading_deg": 90.7,
+        "approach_distance_mm": 110.0,
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "valid_for_ninja": false,
+        "ninja_reason": "ninja_body_outside_granary_forbidden"
+      },
+      "distance_to_approach_mm": 400.0,
+      "heading_error_deg": -87.9,
+      "selection_method": "nearest_valid_approach_pose_one_per_crate_v2",
+      "all_valid_approaches_considered": 100
+    },
+    {
+      "rank": 3,
+      "actor": "main_bot",
+      "target_crate": {
+        "track_id": 50,
+        "aruco_id": 47,
+        "crate_type": "yellow",
+        "x_mm": 1979.6,
+        "y_mm": 169.5,
+        "long_axis_deg": 269.8
+      },
+      "approach_pose": {
+        "name": "end_a_220",
+        "x_mm": 1980.4,
+        "y_mm": 389.5,
+        "heading_deg": 269.8,
+        "approach_distance_mm": 220.0,
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "valid_for_ninja": false,
+        "ninja_reason": "ninja_body_outside_granary_forbidden"
+      },
+      "distance_to_approach_mm": 435.6,
+      "heading_error_deg": 91.2,
+      "selection_method": "nearest_valid_approach_pose_one_per_crate_v2",
+      "all_valid_approaches_considered": 86
+    },
+    {
+      "rank": 4,
+      "actor": "main_bot",
+      "target_crate": {
+        "track_id": 41,
+        "aruco_id": 47,
+        "crate_type": "yellow",
+        "x_mm": 1816.6,
+        "y_mm": 804.7,
+        "long_axis_deg": 88.3
+      },
+      "approach_pose": {
+        "name": "end_a_110",
+        "x_mm": 1813.3,
+        "y_mm": 694.7,
+        "heading_deg": 88.3,
+        "approach_distance_mm": 110.0,
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "valid_for_ninja": false,
+        "ninja_reason": "ninja_body_outside_granary_forbidden"
+      },
+      "distance_to_approach_mm": 452.6,
+      "heading_error_deg": -90.3,
+      "selection_method": "nearest_valid_approach_pose_one_per_crate_v2",
+      "all_valid_approaches_considered": 68
+    },
+    {
+      "rank": 5,
+      "actor": "main_bot",
+      "target_crate": {
+        "track_id": 44,
+        "aruco_id": 36,
+        "crate_type": "blue",
+        "x_mm": 1929.5,
+        "y_mm": 165.6,
+        "long_axis_deg": 90.8
+      },
+      "approach_pose": {
+        "name": "end_b_220",
+        "x_mm": 1926.4,
+        "y_mm": 385.6,
+        "heading_deg": 270.8,
+        "approach_distance_mm": 220.0,
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "valid_for_ninja": false,
+        "ninja_reason": "ninja_body_outside_granary_forbidden"
+      },
+      "distance_to_approach_mm": 475.4,
+      "heading_error_deg": 92.2,
+      "selection_method": "nearest_valid_approach_pose_one_per_crate_v2",
+      "all_valid_approaches_considered": 74
+    }
+  ],
+  "target_switch_reason": "held_previous_target_hysteresis"
+}

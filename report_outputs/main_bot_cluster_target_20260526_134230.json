@@ -1,0 +1,574 @@
+{
+  "active": true,
+  "actor": "main_bot",
+  "target_type": "crate_cluster",
+  "reason": "ok",
+  "robot": {
+    "aruco_id": 1,
+    "kind": "own_official_robot",
+    "team_relation": "own",
+    "x_mm": 1508.6,
+    "y_mm": 715.0,
+    "world_validation": "ok",
+    "tag_center_x_mm": 1508.6,
+    "tag_center_y_mm": 715.0,
+    "x_floor_projection_mm": 1451.2,
+    "y_floor_projection_mm": 347.9,
+    "tag_height_mm": 350.0,
+    "heading_deg": 89.4,
+    "heading_note": "ArUco top-edge direction; align tag top edge with robot forward direction",
+    "size_px": 108.5,
+    "top_plate_color_mode": "mdf",
+    "top_plate_color_note": "current test box is MDF/wood; future main bot expected black",
+    "body_center_source": "tag_center_assumed_centered",
+    "tag_forward_offset_to_body_center_mm": 0.0,
+    "tag_lateral_offset_to_body_center_mm": 0.0,
+    "visible_this_frame": true,
+    "missed_frames": 0,
+    "seen_count": 1747,
+    "confidence": 20,
+    "last_seen_frame": 1751,
+    "smoothed": true
+  },
+  "selected_cluster": {
+    "cluster_id": 1,
+    "target_type": "crate_cluster",
+    "size": 4,
+    "ready_for_four_crate_pickup": true,
+    "center_x_mm": 1841.2,
+    "center_y_mm": 803.2,
+    "spread_x_mm": 153.0,
+    "spread_y_mm": 2.8,
+    "mean_long_axis_deg": 89.7,
+    "color_counts": {
+      "yellow": 2,
+      "blue": 2
+    },
+    "members": [
+      {
+        "track_id": 0,
+        "aruco_id": 47,
+        "crate_type": "yellow",
+        "x_mm": 1817.2,
+        "y_mm": 804.5,
+        "long_axis_deg": 89.1
+      },
+      {
+        "track_id": 14,
+        "aruco_id": 36,
+        "crate_type": "blue",
+        "x_mm": 1865.6,
+        "y_mm": 801.7,
+        "long_axis_deg": 90.7
+      },
+      {
+        "track_id": 2,
+        "aruco_id": 47,
+        "crate_type": "yellow",
+        "x_mm": 1764.6,
+        "y_mm": 802.2,
+        "long_axis_deg": 90.1
+      },
+      {
+        "track_id": 1,
+        "aruco_id": 36,
+        "crate_type": "blue",
+        "x_mm": 1917.6,
+        "y_mm": 804.2,
+        "long_axis_deg": 89.1
+      }
+    ],
+    "planner_note": "Cluster center is a higher-level pickup target. It does not replace the original single-crate target planner unless a controller explicitly uses this topic."
+  },
+  "pickup_center": {
+    "x_mm": 1841.2,
+    "y_mm": 803.2,
+    "meaning": "centroid_of_detected_crate_cluster"
+  },
+  "approach_pose": {
+    "x_mm": 1840.0,
+    "y_mm": 583.2,
+    "heading_deg": 89.7,
+    "approach_distance_mm": 220.0,
+    "target_reference": "cluster_or_fridge_center",
+    "valid_for_main_bot": true,
+    "main_bot_reason": "ok",
+    "distance_to_robot_mm": 356.6
+  },
+  "queue_length": 5,
+  "top_candidates": [
+    {
+      "rank": 1,
+      "actor": "main_bot",
+      "target_type": "crate_cluster",
+      "cluster": {
+        "cluster_id": 1,
+        "target_type": "crate_cluster",
+        "size": 4,
+        "ready_for_four_crate_pickup": true,
+        "center_x_mm": 1841.2,
+        "center_y_mm": 803.2,
+        "spread_x_mm": 153.0,
+        "spread_y_mm": 2.8,
+        "mean_long_axis_deg": 89.7,
+        "color_counts": {
+          "yellow": 2,
+          "blue": 2
+        },
+        "members": [
+          {
+            "track_id": 0,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1817.2,
+            "y_mm": 804.5,
+            "long_axis_deg": 89.1
+          },
+          {
+            "track_id": 14,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1865.6,
+            "y_mm": 801.7,
+            "long_axis_deg": 90.7
+          },
+          {
+            "track_id": 2,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1764.6,
+            "y_mm": 802.2,
+            "long_axis_deg": 90.1
+          },
+          {
+            "track_id": 1,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1917.6,
+            "y_mm": 804.2,
+            "long_axis_deg": 89.1
+          }
+        ],
+        "planner_note": "Cluster center is a higher-level pickup target. It does not replace the original single-crate target planner unless a controller explicitly uses this topic."
+      },
+      "pickup_center": {
+        "x_mm": 1841.2,
+        "y_mm": 803.2,
+        "meaning": "centroid_of_detected_crate_cluster"
+      },
+      "approach_pose": {
+        "x_mm": 1840.0,
+        "y_mm": 583.2,
+        "heading_deg": 89.7,
+        "approach_distance_mm": 220.0,
+        "target_reference": "cluster_or_fridge_center",
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "distance_to_robot_mm": 356.6
+      },
+      "candidate_approach_poses": [
+        {
+          "x_mm": 1840.0,
+          "y_mm": 583.2,
+          "heading_deg": 89.7,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": true,
+          "main_bot_reason": "ok",
+          "distance_to_robot_mm": 356.6
+        },
+        {
+          "x_mm": 1842.4,
+          "y_mm": 1023.2,
+          "heading_deg": 269.7,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": true,
+          "main_bot_reason": "ok",
+          "distance_to_robot_mm": 454.3
+        }
+      ],
+      "distance_to_approach_mm": 356.6,
+      "selection_method": "cluster_centroid_for_main_bot_v1"
+    },
+    {
+      "rank": 2,
+      "actor": "main_bot",
+      "target_type": "crate_cluster",
+      "cluster": {
+        "cluster_id": 2,
+        "target_type": "crate_cluster",
+        "size": 4,
+        "ready_for_four_crate_pickup": true,
+        "center_x_mm": 1154.4,
+        "center_y_mm": 797.6,
+        "spread_x_mm": 149.2,
+        "spread_y_mm": 8.8,
+        "mean_long_axis_deg": 270.4,
+        "color_counts": {
+          "blue": 2,
+          "yellow": 2
+        },
+        "members": [
+          {
+            "track_id": 3,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1229.6,
+            "y_mm": 802.4,
+            "long_axis_deg": 89.8
+          },
+          {
+            "track_id": 6,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1080.4,
+            "y_mm": 793.9,
+            "long_axis_deg": 272.9
+          },
+          {
+            "track_id": 5,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1127.3,
+            "y_mm": 793.6,
+            "long_axis_deg": 268.9
+          },
+          {
+            "track_id": 4,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1180.4,
+            "y_mm": 800.5,
+            "long_axis_deg": 270.1
+          }
+        ],
+        "planner_note": "Cluster center is a higher-level pickup target. It does not replace the original single-crate target planner unless a controller explicitly uses this topic."
+      },
+      "pickup_center": {
+        "x_mm": 1154.4,
+        "y_mm": 797.6,
+        "meaning": "centroid_of_detected_crate_cluster"
+      },
+      "approach_pose": {
+        "x_mm": 1155.9,
+        "y_mm": 577.6,
+        "heading_deg": 90.4,
+        "approach_distance_mm": 220.0,
+        "target_reference": "cluster_or_fridge_center",
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "distance_to_robot_mm": 378.5
+      },
+      "candidate_approach_poses": [
+        {
+          "x_mm": 1152.9,
+          "y_mm": 1017.6,
+          "heading_deg": 270.4,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": true,
+          "main_bot_reason": "ok",
+          "distance_to_robot_mm": 467.0
+        },
+        {
+          "x_mm": 1155.9,
+          "y_mm": 577.6,
+          "heading_deg": 90.4,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": true,
+          "main_bot_reason": "ok",
+          "distance_to_robot_mm": 378.5
+        }
+      ],
+      "distance_to_approach_mm": 378.5,
+      "selection_method": "cluster_centroid_for_main_bot_v1"
+    },
+    {
+      "rank": 3,
+      "actor": "main_bot",
+      "target_type": "crate_cluster",
+      "cluster": {
+        "cluster_id": 4,
+        "target_type": "crate_cluster",
+        "size": 4,
+        "ready_for_four_crate_pickup": true,
+        "center_x_mm": 1904.3,
+        "center_y_mm": 168.3,
+        "spread_x_mm": 153.4,
+        "spread_y_mm": 9.4,
+        "mean_long_axis_deg": 89.1,
+        "color_counts": {
+          "blue": 2,
+          "yellow": 2
+        },
+        "members": [
+          {
+            "track_id": 15,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1879.6,
+            "y_mm": 173.1,
+            "long_axis_deg": 90.7
+          },
+          {
+            "track_id": 20,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1980.5,
+            "y_mm": 168.0,
+            "long_axis_deg": 268.8
+          },
+          {
+            "track_id": 19,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1827.1,
+            "y_mm": 168.5,
+            "long_axis_deg": 89.6
+          },
+          {
+            "track_id": 17,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1930.0,
+            "y_mm": 163.7,
+            "long_axis_deg": 87.3
+          }
+        ],
+        "planner_note": "Cluster center is a higher-level pickup target. It does not replace the original single-crate target planner unless a controller explicitly uses this topic."
+      },
+      "pickup_center": {
+        "x_mm": 1904.3,
+        "y_mm": 168.3,
+        "meaning": "centroid_of_detected_crate_cluster"
+      },
+      "approach_pose": {
+        "x_mm": 1907.8,
+        "y_mm": 388.3,
+        "heading_deg": 269.1,
+        "approach_distance_mm": 220.0,
+        "target_reference": "cluster_or_fridge_center",
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "distance_to_robot_mm": 515.8
+      },
+      "candidate_approach_poses": [
+        {
+          "x_mm": 1900.8,
+          "y_mm": -51.7,
+          "heading_deg": 89.1,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": false,
+          "main_bot_reason": "outside_arena_or_wall_margin",
+          "distance_to_robot_mm": 861.2
+        },
+        {
+          "x_mm": 1907.8,
+          "y_mm": 388.3,
+          "heading_deg": 269.1,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": true,
+          "main_bot_reason": "ok",
+          "distance_to_robot_mm": 515.8
+        }
+      ],
+      "distance_to_approach_mm": 515.8,
+      "selection_method": "cluster_centroid_for_main_bot_v1"
+    },
+    {
+      "rank": 4,
+      "actor": "main_bot",
+      "target_type": "crate_cluster",
+      "cluster": {
+        "cluster_id": 5,
+        "target_type": "crate_cluster",
+        "size": 4,
+        "ready_for_four_crate_pickup": true,
+        "center_x_mm": 1785.4,
+        "center_y_mm": 1745.7,
+        "spread_x_mm": 305.9,
+        "spread_y_mm": 59.1,
+        "mean_long_axis_deg": 89.4,
+        "color_counts": {
+          "blue": 2,
+          "yellow": 2
+        },
+        "members": [
+          {
+            "track_id": 31,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1886.8,
+            "y_mm": 1716.7,
+            "long_axis_deg": 88.2
+          },
+          {
+            "track_id": 34,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 1684.8,
+            "y_mm": 1775.8,
+            "long_axis_deg": 269.5
+          },
+          {
+            "track_id": 33,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1632.0,
+            "y_mm": 1768.9,
+            "long_axis_deg": 270.3
+          },
+          {
+            "track_id": 32,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 1937.9,
+            "y_mm": 1721.5,
+            "long_axis_deg": 269.4
+          }
+        ],
+        "planner_note": "Cluster center is a higher-level pickup target. It does not replace the original single-crate target planner unless a controller explicitly uses this topic."
+      },
+      "pickup_center": {
+        "x_mm": 1785.4,
+        "y_mm": 1745.7,
+        "meaning": "centroid_of_detected_crate_cluster"
+      },
+      "approach_pose": {
+        "x_mm": 1783.1,
+        "y_mm": 1525.7,
+        "heading_deg": 89.4,
+        "approach_distance_mm": 220.0,
+        "target_reference": "cluster_or_fridge_center",
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "distance_to_robot_mm": 855.9
+      },
+      "candidate_approach_poses": [
+        {
+          "x_mm": 1783.1,
+          "y_mm": 1525.7,
+          "heading_deg": 89.4,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": true,
+          "main_bot_reason": "ok",
+          "distance_to_robot_mm": 855.9
+        },
+        {
+          "x_mm": 1787.7,
+          "y_mm": 1965.7,
+          "heading_deg": 269.4,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": false,
+          "main_bot_reason": "outside_arena_or_wall_margin",
+          "distance_to_robot_mm": 1281.5
+        }
+      ],
+      "distance_to_approach_mm": 855.9,
+      "selection_method": "cluster_centroid_for_main_bot_v1"
+    },
+    {
+      "rank": 5,
+      "actor": "main_bot",
+      "target_type": "crate_cluster",
+      "cluster": {
+        "cluster_id": 3,
+        "target_type": "crate_cluster",
+        "size": 4,
+        "ready_for_four_crate_pickup": true,
+        "center_x_mm": 2826.2,
+        "center_y_mm": 1196.7,
+        "spread_x_mm": 6.1,
+        "spread_y_mm": 149.6,
+        "mean_long_axis_deg": 2.8,
+        "color_counts": {
+          "blue": 2,
+          "yellow": 2
+        },
+        "members": [
+          {
+            "track_id": 7,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 2828.7,
+            "y_mm": 1271.7,
+            "long_axis_deg": 3.9
+          },
+          {
+            "track_id": 13,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 2827.3,
+            "y_mm": 1122.1,
+            "long_axis_deg": 2.1
+          },
+          {
+            "track_id": 10,
+            "aruco_id": 36,
+            "crate_type": "blue",
+            "x_mm": 2826.3,
+            "y_mm": 1173.0,
+            "long_axis_deg": 183.2
+          },
+          {
+            "track_id": 9,
+            "aruco_id": 47,
+            "crate_type": "yellow",
+            "x_mm": 2822.6,
+            "y_mm": 1220.1,
+            "long_axis_deg": 181.9
+          }
+        ],
+        "planner_note": "Cluster center is a higher-level pickup target. It does not replace the original single-crate target planner unless a controller explicitly uses this topic."
+      },
+      "pickup_center": {
+        "x_mm": 2826.2,
+        "y_mm": 1196.7,
+        "meaning": "centroid_of_detected_crate_cluster"
+      },
+      "approach_pose": {
+        "x_mm": 2606.5,
+        "y_mm": 1186.0,
+        "heading_deg": 2.8,
+        "approach_distance_mm": 220.0,
+        "target_reference": "cluster_or_fridge_center",
+        "valid_for_main_bot": true,
+        "main_bot_reason": "ok",
+        "distance_to_robot_mm": 1194.7
+      },
+      "candidate_approach_poses": [
+        {
+          "x_mm": 2606.5,
+          "y_mm": 1186.0,
+          "heading_deg": 2.8,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": true,
+          "main_bot_reason": "ok",
+          "distance_to_robot_mm": 1194.7
+        },
+        {
+          "x_mm": 3045.9,
+          "y_mm": 1207.4,
+          "heading_deg": 182.8,
+          "approach_distance_mm": 220.0,
+          "target_reference": "cluster_or_fridge_center",
+          "valid_for_main_bot": false,
+          "main_bot_reason": "outside_arena_or_wall_margin",
+          "distance_to_robot_mm": 1614.2
+        }
+      ],
+      "distance_to_approach_mm": 1194.7,
+      "selection_method": "cluster_centroid_for_main_bot_v1"
+    }
+  ],
+  "selection_method": "cluster_centroid_for_main_bot_v1",
+  "old_single_crate_topics_unchanged": true,
+  "distance_to_approach_mm": 356.6
+}

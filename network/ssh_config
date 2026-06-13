@@ -1,0 +1,37 @@
+# Eurobot 2026 — SSH Config
+# Copy relevant entries into ~/.ssh/config on your machine.
+# Two networks are used: D-Link LAN (192.168.0.x) at the arena,
+# and Tailscale (100.x.x.x) for remote access from anywhere.
+
+# ── Overhead laptop ────────────────────────────────────────────
+# D-Link LAN (arena)
+Host overhead-lan
+  HostName 192.168.0.10
+  User eurobot2026overhead
+
+# Tailscale (remote)
+Host overhead-ts
+  HostName 100.101.185.35
+  User eurobot2026overhead
+
+# ── Main bot Pi ────────────────────────────────────────────────
+# D-Link LAN (arena)
+Host main-lan
+  HostName 192.168.0.20
+  User eurobot2026
+
+# Tailscale (remote)
+Host main-ts
+  HostName 100.100.123.3
+  User eurobot2026
+
+# ── Ninja bot Pi ───────────────────────────────────────────────
+# D-Link LAN (arena)
+Host ninja-lan
+  HostName 192.168.0.30
+  User eurobotninja2026
+
+# Tailscale (remote)
+Host ninja-ts
+  HostName 100.111.17.73
+  User eurobotninja2026

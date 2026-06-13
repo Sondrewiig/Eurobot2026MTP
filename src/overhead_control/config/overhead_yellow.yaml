@@ -1,0 +1,147 @@
+overhead_camera_node:
+  ros__parameters:
+    # ------------------------------------------------------------
+    # Team / camera
+    # ------------------------------------------------------------
+    team_side: "yellow"
+    device: "/dev/video2"
+
+    camera_width: 3840
+    camera_height: 2160
+    camera_fps: 30
+    camera_fourcc: "MJPG"
+
+    display_width: 1280
+    display_height: 720
+    publish_images: true
+    show_windows: false
+
+    # ------------------------------------------------------------
+    # Arena geometry
+    # Coordinates are in mm.
+    # x: 0..3000 left-to-right
+    # y: 0..2000 front-to-rear
+    # ------------------------------------------------------------
+    arena_width_mm: 3000.0
+    arena_height_mm: 2000.0
+
+    # Camera ground projection for yellow-side mounting
+    camera_x_mm: 1275.0
+    camera_y_mm: 2100.0
+    camera_height_mm: 1670.0
+
+    # Arena reference markers
+    marker_20_x: 600.0
+    marker_20_y: 1400.0
+
+    marker_21_x: 2400.0
+    marker_21_y: 1400.0
+
+    marker_22_x: 600.0
+    marker_22_y: 600.0
+
+    marker_23_x: 2400.0
+    marker_23_y: 600.0
+
+    # ------------------------------------------------------------
+    # IDs / rule reference notes
+    # Step 10 uses DICT_4X4_100 internally, then filters allowed IDs.
+    # Official blue robot IDs: 1..5
+    # Official yellow robot IDs: 6..10
+    # Arena/reference/crate IDs: 20,21,22,23,36,47,41
+    # Optional blue ninja IDs: 55,56,57
+    # Optional own yellow ninja IDs: 75,76,77
+    # ------------------------------------------------------------
+    arena_ref_ids: [20, 21, 22, 23]
+    jenga_ids: [36, 47]
+    empty_crate_ids: [41]
+    robot_blue_ids: [1, 2, 3, 4, 5]
+    robot_yellow_ids: [6, 7, 8, 9, 10]
+    blue_ninja_ids: [55, 56, 57]
+    yellow_ninja_ids: [75, 76, 77]
+
+    # ------------------------------------------------------------
+    # Height correction
+    # Homography is calibrated for the floor plane.
+    # These heights correct elevated ArUco tags before publishing x/y.
+    # Current test setup:
+    # - main robot tag is on a 350 mm box
+    # - ninja is 145 mm high and mainly operates on 55 mm granary
+    #   so ninja tag plane is approx 145 + 55 = 200 mm
+    # Later official main beacon marker may be about 450 mm tag plane.
+    # ------------------------------------------------------------
+    jenga_tag_height_main_mm: 30.0
+    granary_height_mm: 55.0
+    jenga_tag_height_granary_mm: 85.0
+    official_robot_tag_height_mm: 350.0
+    ninja_tag_height_mm: 200.0
+
+    # ============================================================
+    # >>> SET THESE BEFORE EACH MATCH <<<  (YELLOW side)
+    # ============================================================
+    # Exactly one tag is mounted on each of your robots per match.
+    # Yellow ninja tag must be one of: 75, 76, 77
+    # Yellow main-robot tag must be one of: 6, 7, 8, 9, 10
+    # With the filter flags below = true, the overhead locks onto exactly the
+    # IDs you set here and ignores all other own-side candidates.
+    # ------------------------------------------------------------
+    ninja_aruco_id: 76
+    main_robot_aruco_id: -1          # set to your main bot's tag (6..10) when known
+
+    # Lock to the IDs above instead of auto-selecting. Keep these true for
+    # match use so a stray same-range tag can never be mistaken for your bot.
+    filter_to_configured_ninja_id: true
+    filter_to_configured_main_robot_id: true
+    # ============================================================
+
+    # ------------------------------------------------------------
+    # Crate orientation / approach poses
+    # ------------------------------------------------------------
+    marker_to_crate_length_offset_deg: 0.0
+    crate_approach_distance_mm: 220.0
+    approach_wall_margin_mm: 120.0
+
+    # ------------------------------------------------------------
+    # Top-down visualization
+    # Leave background path empty; launch file auto-selects installed PNG.
+    # ------------------------------------------------------------
+    topdown_background_path: ""
+    topdown_overlay_alpha: 0.70
+
+    # ------------------------------------------------------------
+    # ArUco detection tuning for far/small tags
+    # ------------------------------------------------------------
+    aruco_enable_clahe: true
+    aruco_enable_sharpen: true
+    aruco_second_pass: true
+    aruco_clahe_clip_limit: 2.0
+    aruco_clahe_tile_grid: 8
+    aruco_sharpen_amount: 0.70
+    aruco_min_marker_perimeter_rate: 0.008
+    aruco_max_marker_perimeter_rate: 4.0
+    aruco_adaptive_thresh_win_size_min: 3
+    aruco_adaptive_thresh_win_size_max: 53
+    aruco_adaptive_thresh_win_size_step: 10
+    aruco_corner_refinement: true
+    aruco_duplicate_center_px: 20.0
+
+    # ------------------------------------------------------------
+    # Crate tracker
+    # ------------------------------------------------------------
+    cluster_distance_mm: 140.0
+    duplicate_merge_distance_mm: 30.0
+    smoothing_alpha: 0.30
+    smoothing_alpha_angle: 0.25
+    max_missed_frames: 20
+    min_confidence_to_show: 2
+
+    # ------------------------------------------------------------
+    # Robot track smoothing (own ninja, own main robot, opponent)
+    # Lower values = more lag; raise toward 1.0 for less phase delay at the
+    # cost of more position/heading jitter on a stationary marker.
+    # 0.35 / 0.25 (the in-code defaults) cause visible wobble when the
+    # downstream go_to_point controller acts on stale heading; 0.6 / 0.5
+    # roughly halves the phase lag.
+    # ------------------------------------------------------------
+    robot_smoothing_alpha: 0.60
+    robot_smoothing_alpha_angle: 0.50

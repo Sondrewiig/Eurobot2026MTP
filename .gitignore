@@ -10,6 +10,11 @@ __pycache__/
 
 stereo_pairs/
 calibration_backup/
-src/sondre_bot_sim/
-src/sondre_bot_vision/
 log/
+
+logs/
+pi_tuning_logs/
+*.bak_*
+overhead_world_state_snapshot.json
+Function
+__pycache__/

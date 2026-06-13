@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>main_bot_sim</name>
+  <version>0.0.0</version>
+  <description>Simulation package for the Eurobot main robot</description>
+
+  <maintainer email="sondre@todo.todo">sondre</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>ros_gz_image</exec_depend>
+  <exec_depend>stereo_image_proc</exec_depend>
+  <exec_depend>main_bot_control</exec_depend>
+  <exec_depend>overhead_control</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

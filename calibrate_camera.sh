@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-WORKSPACE="$HOME/Eurobot2026MTP"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE="${WORKSPACE:-$SCRIPT_DIR}"
 VIDEO_DEVICE="/dev/video0"
 IMAGE_SIZE="[1344,376]"
 FPS="[1,15]"
@@ -32,7 +33,7 @@ if [ ! -f "$WORKSPACE/install/setup.bash" ]; then
     echo "[ERROR] Workspace is not built yet."
     echo "Run:"
     echo "  cd $WORKSPACE"
-    echo "  colcon build --symlink-install --packages-select sondre_bot_control"
+    echo "  colcon build --symlink-install --packages-select main_bot_control"
     exit 1
 fi
 
@@ -59,12 +60,15 @@ CAM_PID=$!
 sleep 2
 
 echo "[INFO] Starting left-eye splitter..."
-nohup ros2 run sondre_bot_control zed_left_splitter --ros-args \
+nohup ros2 run main_bot_control zed_left_splitter --ros-args \
   -p image_in:=/zed/image_raw \
   -p camera_info_in:=/zed/camera_info \
-  -p image_out:=/camera/left/image_raw \
-  -p camera_info_out:=/camera/left/camera_info \
-  -p calibration_yaml:="$CALIB_YAML" \
+  -p left_image_out:=/camera/left/image_raw \
+  -p right_image_out:=/camera/right/image_raw \
+  -p left_camera_info_out:=/camera/left/camera_info \
+  -p right_camera_info_out:=/camera/right/camera_info \
+  -p left_calibration_yaml:="$CALIB_YAML" \
+  -p right_calibration_yaml:="$CALIB_YAML" \
   > "$LOG_DIR/calib_splitter.log" 2>&1 &
 SPLIT_PID=$!
 
