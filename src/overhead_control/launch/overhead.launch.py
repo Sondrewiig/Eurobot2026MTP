@@ -1,3 +1,24 @@
+#!/usr/bin/env python3
+"""
+overhead_camera_node.py
+
+Main overhead vision node. Runs on the laptop.
+
+Reads frames from the Brio 4K USB camera, applies a homography to produce
+a top-down arena view, detects ArUco markers for crates and robots, tracks
+crates across frames, and publishes the full world state as JSON.
+
+Publishes:
+  /overhead/world_state_json        std_msgs/String  — full arena state: crates, robots, targets
+  /overhead/opponent_robots_json    std_msgs/String  — confirmed opponent robot positions
+  /overhead/debug_image             sensor_msgs/Image — annotated top-down view
+  /overhead/topdown_image           sensor_msgs/Image — clean top-down view
+  /overhead/status                  std_msgs/String  — one-line health summary
+
+Configuration is loaded from overhead_blue.yaml or overhead_yellow.yaml
+depending on the team side argument passed at launch.
+"""
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PythonExpression

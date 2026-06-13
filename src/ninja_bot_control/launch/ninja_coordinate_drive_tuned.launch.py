@@ -3,38 +3,15 @@ ninja_coordinate_drive_tuned.launch.py
 
 Ninja Pi-side drive stack: esp32_bridge + go_to_point.
 
-The overhead-to-pose conversion runs on the laptop now (overhead_control.
-ninja_pose_from_overhead launched from overhead.launch.py), so this launch
-only contains the bot's local motion stack. /ninja/pose arrives over ROS
-from the laptop.
+Pose is computed on the laptop (overhead_control/ninja_pose_from_overhead)
+and arrives on the Pi via /ninja/pose over ROS. This launch contains only
+the local motion stack.
 
-Param overrides applied here (vs the code defaults):
-
-  esp32_bridge.command_rate_hz: 5 -> 20
-    The default 5 Hz throttles go_to_point's 20 Hz heading corrections down
-    to 200 ms ticks. 20 Hz makes the bridge match the controller.
-
-  esp32_bridge.max_pwm_step_per_tick: 8 -> 30 (at 20 Hz)
-    Slew rate. Old 5 Hz x 8 = 40 PWM/s, robot took ~2.6 s to reach top
-    speed. New 20 Hz x 30 = 600 PWM/s, min-to-max in ~0.2 s.
-
-  esp32_bridge.turn_scale: 0.45
-    Enough wheel differential for overhead correction, but not full spin authority.
-
-  esp32_bridge.drive_guard_norm: 0.08 -> 0.20
-    Reverse guard triggers later, so in-place spin still works for
-    low-speed corrections.
-
-  go_to_point.max_linear_mps: 0.05 -> 0.18
-    5 cm/s was too slow to stay ahead of pose noise. 0.18 is safe.
-
-  go_to_point.k_angular: 0.50
-  go_to_point.max_angular_radps: 0.18
-    Conservative correction for overhead testing. This prevents the robot
-    from spinning aggressively while still correcting diagonal drift.
-
-  go_to_point.turn_in_place_threshold_deg: 45
-    Small heading errors are corrected while driving; large errors rotate first.
+Parameters are tuned for overhead-guided navigation: the bridge rate matches
+the controller correction rate, turn scale is limited to prevent overshoot
+under overhead feedback lag, and the reverse guard is relaxed enough to allow
+in-place rotation while still protecting against unintended reverse during
+forward drive.
 """
 
 from launch import LaunchDescription
@@ -99,18 +76,18 @@ def generate_launch_description():
         ),
 
         DeclareLaunchArgument("gtp_max_linear_mps", default_value="0.04"),
-        # Halved from 0.35: lower spin cap so overshoot is small.
+        # Lower spin cap so overshoot is small.
         DeclareLaunchArgument("gtp_max_angular_radps", default_value="0.18"),
         DeclareLaunchArgument("gtp_k_linear", default_value="0.8"),
-        # Dropped 0.9 -> 0.5: the #1 fix for the back-and-forth spin. With
+        # For the back-and-forth spin. With
         # overhead feedback lag, high angular gain overshoots and oscillates.
         DeclareLaunchArgument("gtp_k_angular", default_value="0.50"),
-        # Raised 18 -> 40: don't demand near-perfect aim before driving.
+        # Don't demand near-perfect aim before driving.
         # Letting it drive forward while gently correcting damps the spin-hunt.
         DeclareLaunchArgument(
             "gtp_turn_in_place_threshold_deg", default_value="45.0"
         ),
-        # Looser arrival so it doesn't twitch hunting the last few mm.
+        # Higher tolerance for counting the last few mm.
         DeclareLaunchArgument("gtp_xy_tolerance_mm", default_value="30.0"),
         DeclareLaunchArgument("gtp_heading_tolerance_deg", default_value="10.0"),
         DeclareLaunchArgument("gtp_use_goal_heading", default_value="false"),

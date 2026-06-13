@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-Low-bandwidth Ninja crate detector for ROS 2.
+crate_detector_node.py
+
+Onboard ArUco crate detector for the Ninja Pi camera. Detects hazelnut crate
+markers (IDs 36, 47, 41) from the Pi CSI camera and publishes position and
+orientation data for the crate alignment node.
 
 Subscribes:
   /ninja/camera/image_raw           sensor_msgs/Image
@@ -317,7 +321,7 @@ class CrateDetectorNode(Node):
         img_cx = w // 2
         img_cy = h // 2
 
-        # Old tuning view centre reference, softened so it does not dominate the image.
+        # Visual centre reference line, softened so it does not dominate the debug image.
         # Vertical camera centreline: thin cyan over a subtle dark grey shadow.
         cv2.line(img, (img_cx, 0), (img_cx, h), (70, 70, 70), 2)
         cv2.line(img, (img_cx, 0), (img_cx, h), (180, 220, 220), 1)
@@ -337,7 +341,7 @@ class CrateDetectorNode(Node):
             size = float(d["marker_size_px"])
             angle = float(d["raw_angle_deg"])
 
-            # Old-style visual centre offset: blue line from tag centre to the camera centreline.
+            # Visual offset indicator: line from tag centre to the camera centreline.
             # The horizontal segment is the actual pixel error used by alignment.
             cv2.line(img, (img_cx, cy), (cx, cy), (255, 0, 0), 2)
             cv2.circle(img, (cx, cy), 6, (0, 0, 255), -1)

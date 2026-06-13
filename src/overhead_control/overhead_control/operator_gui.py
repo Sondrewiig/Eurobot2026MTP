@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 """
-operator_gui.py - Eurobot Ninja operator station.
+operator_gui.py
 
-This version keeps ONE original GUI and separates commands into:
+Operator control station for the Ninja SIMA. Runs on the laptop.
 
-Simple operator commands:
-  x 1900       axis move along X using defaults
-  y 1700       axis move along Y using defaults
-  diag X Y     special diagonal step move
-  turnto -90   rotate in place to absolute heading
-  align        enable onboard crate-align node
-  pickup       tiltdown -> twocrates -> tiltup
+Provides a Tkinter GUI with a command input and live camera feed.
+Operator types commands to drive the Ninja via the overhead pose system.
 
-Advanced tuning commands:
-  pulsex TARGET_X [Y_LINE] [HEADING_DEG] [STEP_MM] [TOL_MM]
-  pulsey TARGET_Y [X_LINE] [HEADING_DEG] [STEP_MM] [TOL_MM]
-
-The simple x/y commands are aliases around the same internal step/pulse
-movement, but with safe defaults and current line/heading.
+Drive commands:
+  enable             arm drive — required before any movement
+  x X               move to target X, keep current Y and heading
+  y Y               move to target Y, keep current X and heading
+  diag X Y          diagonal step move
+  turnto DEG        rotate in place to absolute heading
+  pulsex / pulsey   advanced axis moves with tunable step and tolerance
+  align             enable onboard crate-align node
+  pickup            tilt down -> grip two crates -> tilt up
+  drop              tilt down to 45° -> release crates
+  stop              disarm drive and send ESP32 stop
+  esp <cmd>         send raw command to /ninja/esp32_cmd
 """
 
 import json

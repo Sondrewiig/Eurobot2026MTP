@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
 """
-Step 32 - ESP32 bridge with quiet logging and safer differential mixing.
+esp32_bridge.py
 
-Runs on the Ninja Pi.
+Serial bridge between ROS 2 and the ESP32 motor controller. Runs on the Ninja Pi.
 
-Input:
-  /cmd_vel           geometry_msgs/Twist
-  /ninja/esp32_cmd   std_msgs/String raw commands: ping, stop, motors L R
+Subscribes:
+  /cmd_vel           geometry_msgs/Twist  — velocity commands from go_to_point or crate_align
+  /ninja/esp32_cmd   std_msgs/String      — raw ESP32 commands: ping, stop, motors L R
 
-Output:
-  serial to ESP32
-  /ninja/telemetry   std_msgs/String
-  /ninja/connected   std_msgs/Bool
+Publishes:
+  /ninja/telemetry   std_msgs/String  — raw serial output from ESP32
+  /ninja/connected   std_msgs/Bool    — serial connection status
 
-Why this version exists:
-  - Step 30 could spam terminal logs at command_rate_hz.
-  - Deadband PWM makes tiny commands usable, but differential mixing can easily
-    become motors +PWM -PWM, causing spin-in-place.
-  - This version can prevent reverse wheel commands while driving forward, while
-    still allowing true in-place turns when linear.x is near zero.
+Converts Twist commands to differential PWM motor commands. The drivetrain has
+a high practical minimum PWM, so a deadband is applied to make small commands
+usable. A reverse guard prevents unintended backward wheel spin during forward
+drive while still allowing true in-place turns when linear.x is near zero.
 """
 
 import json
@@ -46,18 +43,18 @@ class Esp32Bridge(Node):
         self.declare_parameter("port", "/dev/ttyUSB0")
         self.declare_parameter("baudrate", 115200)
 
-        # Motor output limits. For your current ninja, min_pwm is around 150.
-        self.declare_parameter("min_pwm", 150)
-        self.declare_parameter("max_pwm", 155)
+        # Motor output limits. min_pwm is the practical deadband threshold for this drivetrain.
+        self.declare_parameter("min_pwm", 160)
+        self.declare_parameter("max_pwm", 255)
 
         # cmd_vel full-scale values used to normalize cmd_vel into -1..+1.
         self.declare_parameter("linear_full_scale_mps", 0.10)
         self.declare_parameter("angular_full_scale_radps", 0.80)
 
-        # Reduce turn_scale when the robot wiggles or spins instead of driving.
+        # Scales wheel differential for turning. Lower values give gentler turns.
         self.declare_parameter("turn_scale", 0.10)
 
-        # Serial command output rate. 5 Hz is enough for first floor tests.
+        # Serial command output rate. Must match or exceed the controller correction rate.
         self.declare_parameter("command_rate_hz", 5.0)
         self.declare_parameter("cmd_vel_timeout_sec", 0.4)
 

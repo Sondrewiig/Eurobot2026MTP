@@ -68,8 +68,7 @@ def generate_launch_description():
                 "cmd_vel_topic":   "/cmd_vel",
                 "enable_topic":    "/ninja/enable_drive",
                 # Operator must type `enable` before driving.
-                # Stronger values were needed during final testing so the
-                # drivetrain overcomes static friction and turns reliably.
+                # Values tuned to overcome drivetrain static friction.
                 "start_enabled":   False,
                 "max_linear_mps":          0.08,
                 "max_angular_radps":       0.25,

@@ -1,30 +1,19 @@
 #!/usr/bin/env python3
 """
-Step 29 - Publish /ninja/pose from the overhead world_state_json.
+ninja_pose_from_overhead.py
 
-Runs on the overhead laptop or on any machine that can see /overhead/world_state_json.
+Publishes Ninja pose from the overhead world state. Runs on the laptop.
 
-Input:
+Reads the robots.ninja entry from /overhead/world_state_json and publishes
+a clean Pose2D on /ninja/pose for the Ninja Pi drive stack to consume.
+
+Subscribes:
   /overhead/world_state_json  std_msgs/String JSON
 
-Output:
-  /ninja/pose                 geometry_msgs/Pose2D
-  /ninja/pose_json            std_msgs/String JSON debug
-  /ninja/pose_status          std_msgs/String short status
-
-Pose convention:
-  pose.x     = world X in millimetres
-  pose.y     = world Y in millimetres
-  pose.theta = heading in radians
-
-Default behavior:
-  Uses the already-corrected overhead ninja body center: robots.ninja.x_mm/y_mm.
-  This avoids double-applying the current ninja tag offset from overhead_camera_node.
-
-If you later want this node to apply marker-to-center offset itself, set:
-  use_overhead_body_center:=false
-  marker_to_center_x_mm:=...
-  marker_to_center_y_mm:=...
+Publishes:
+  /ninja/pose         geometry_msgs/Pose2D  — x, y in mm, theta in radians
+  /ninja/pose_json    std_msgs/String JSON  — debug
+  /ninja/pose_status  std_msgs/String       — short status
 """
 
 import json
@@ -55,7 +44,7 @@ class NinjaPoseFromOverhead(Node):
         self.declare_parameter('pose_json_topic', '/ninja/pose_json')
         self.declare_parameter('status_topic', '/ninja/pose_status')
 
-        # Set to 57 for your current ninja. Use -1 to accept whichever overhead selected as ninja.
+        # Set to the ninja's ArUco ID, or -1 to accept whichever marker the overhead selected.
         self.declare_parameter('ninja_marker_id', 57)
 
         # Extra heading correction if tag forward and robot forward are not aligned.

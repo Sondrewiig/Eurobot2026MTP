@@ -1,25 +1,21 @@
 #!/usr/bin/env python3
 """
-Step 29 - Simple /ninja/pose to /cmd_vel go-to-point test node.
+esp32_bridge.py
 
-Runs on the Ninja Pi.
+Serial bridge between ROS 2 and the ESP32 motor controller. Runs on the Ninja Pi.
 
-Input:
-  /ninja/pose       geometry_msgs/Pose2D
-  /ninja/goal_pose  geometry_msgs/Pose2D
+Subscribes:
+  /cmd_vel           geometry_msgs/Twist  — velocity commands from go_to_point or crate_align
+  /ninja/esp32_cmd   std_msgs/String      — raw ESP32 commands: ping, stop, motors L R
 
-Output:
-  /cmd_vel                      geometry_msgs/Twist
-  /ninja/go_to_point_status     std_msgs/String JSON
+Publishes:
+  /ninja/telemetry   std_msgs/String  — raw serial output from ESP32
+  /ninja/connected   std_msgs/Bool    — serial connection status
 
-Pose/goal convention:
-  x, y in millimetres, theta in radians.
-
-cmd_vel convention:
-  linear.x in metres/second, angular.z in radians/second.
-
-Safety defaults are intentionally slow.
-Test first with ESP disconnected or robot wheels lifted.
+Converts Twist commands to differential PWM motor commands. The drivetrain has
+a high practical minimum PWM, so a deadband is applied to make small commands
+usable. A reverse guard prevents unintended backward wheel spin during forward
+drive while still allowing true in-place turns when linear.x is near zero.
 """
 
 import json
@@ -79,9 +75,9 @@ class NinjaGoToPointTest(Node):
         self.declare_parameter('turn_in_place_threshold_deg', 90.0)
         self.declare_parameter('slowdown_radius_mm', 150.0)
 
-        # If robot turns the wrong way, set turn_sign:=-1.0.
+        # Flip turn_sign to -1.0 if the drivetrain turn direction is inverted.
         self.declare_parameter('turn_sign', 1.0)
-        # If robot drives backward when commanded forward, set drive_sign:=-1.0.
+        # Flip drive_sign to -1.0 if the drivetrain drive direction is inverted.
         self.declare_parameter('drive_sign', 1.0)
 
         # Master arming. When False, /cmd_vel stays zero even if a goal arrives.

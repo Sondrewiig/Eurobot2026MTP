@@ -1,299 +1,90 @@
-# Useful Git Commands
+# Ninja bot — commands and setup
 
-`git status`  
-Shows current branch and changed files.
+## Build and source
 
-`git branch`  
-Shows local branches. The current branch has `*`.
-
-`git branch -a`  
-Shows local branches and GitHub branches.
-
-`git fetch --all --prune`  
-Updates the branch list from GitHub.
-
-`git switch main`  
-Switch to `main`.
-
-`git switch ninja`  
-Switch to `ninja`.
-
-`git switch -c ninja`  
-Create a new local `ninja` branch. Only use if it does not exist yet.
-
-`git switch -c ninja origin/ninja`  
-Get the `ninja` branch from GitHub on a new computer. Only use once per computer.
-
-`git pull`  
-Download newest changes for the branch you are currently on.
-
-`git add .`  
-Stage all changed files.
-
-`git add src/package_name`  
-Add one specific ROS2 package folder.
-
-`git add src/ninja_bot_control/ninja_bot_control/esp32_bridge.py`  
-Add one specific file inside the ninja package.
-
-`git commit -m "message"`  
-Save staged changes locally.
-
-`git push`  
-Upload committed changes to GitHub.
-
-`git push -u origin ninja`  
-First push when you created a new branch locally and it does not exist on GitHub yet. Usually only once.
-
-Note: Git stays on the last branch you switched to until you switch again.
-
-`sudo apt install gh`
-` gh auth login`
-
-Authenticate for saving in git
-
-`git fetch  --all`
-`git switch Thanish` - to the branch you want to merge with
-`git merge origin/Eimund` - so the branch you merge from will overwrite the current branch so Thanish 
-
-
-## ROS2 Ninja Setup
-
-`cd ~/Eurobot2026MTP`  
-Go to workspace.
-
-`source /opt/ros/jazzy/setup.bash`  
-Load ROS2 Jazzy.
-
-`colcon build --packages-select ninja_bot_control`  
-Build ninja package.
-
-`source install/setup.bash`  
-Load workspace after building.
-
-`ros2 pkg executables ninja_bot_control`  
-Check available ninja nodes.
-
-
-## ESP32 Direct Serial Test
-
-`ls /dev/ttyUSB* /dev/ttyACM*`  
-Find ESP32 port.
-
-`python3 -m serial.tools.miniterm /dev/ttyUSB0 115200`  
-Open direct serial to ESP32.
-
-`Ctrl + ]`  
-Exit miniterm.
-
-`Ctrl + AltGr + 9`  
-Exit miniterm on Nordic keyboard.
-
-Useful ESP32 commands:
-
-```text
-ping
-settings
-stop
-watchdog off
-m1 60
-m1 0
-m2 60
-m2 0
-watchdog on
-timeout 300
+```bash
+cd ~/Eurobot2026MTP
+source /opt/ros/jazzy/setup.bash
+colcon build --packages-select ninja_bot_control
+source install/setup.bash
 ```
 
+---
 
-## ROS2 Ninja Bridge Test
+## Launch
 
-Terminal 1:
+### Full match stack — drive + camera + crate align (Ninja Pi)
 
-`ros2 run ninja_bot_control esp32_bridge --ros-args -p port:=/dev/ttyUSB0`  
-Run ESP32 bridge.
+Drive and crate alignment were validated separately.Drive and crate alignment were validated separately. 
+Both subsystems write to /cmd_vel and conflict when run together. Unifying them requires the same mode-switching 
+approach used in the main bot, which was identified but not implemented within the project timeline.
 
-Terminal 2:
-
-`ros2 topic echo /ninja/telemetry`  
-Read bridge/ESP32 messages.
-
-Terminal 3:
-
-`ros2 topic pub --once /ninja/esp32_cmd std_msgs/msg/String "{data: 'ping'}"`  
-Test connection.
-
-`ros2 topic pub --once /ninja/esp32_cmd std_msgs/msg/String "{data: 'settings'}"`  
-Show ESP32 settings.
-
-`ros2 topic pub --once /ninja/esp32_cmd std_msgs/msg/String "{data: 'stop'}"`  
-Stop motors.
-
-`ros2 topic pub --once /ninja/esp32_cmd std_msgs/msg/String "{data: 'motors 80 80'}"`  
-Drive both motors slowly.
-
-
-## Ninja Command Terminal
-
-Terminal 1:
-
-`ros2 run ninja_bot_control esp32_bridge --ros-args -p port:=/dev/ttyUSB0`  
-Bridge must run first because it owns USB serial.
-
-Terminal 2:
-
-`ros2 run ninja_bot_control ninja_cmd_terminal`  
-Open short command terminal.
-
-Then type commands directly:
-
-```text
-ping
-settings
-stop
-m1 60
-m1 0
-motors 80 80
+```bash
+./scripts/bringup_ninja.sh
 ```
 
-## Ninja commands 
+### Drive only — overhead navigation, no onboard camera (Ninja Pi)
 
-```Esp32
-
-ping
-help
-settings
-resetsettings
+```bash
+./scripts/bringup_ninja_overhead_drive.sh
 ```
 
-```Motor tuning
+### Crate alignment — camera + align, no go_to_point (Ninja Pi)
 
-trim <left_trim> <right_trim>
-minpwm <0-255>
-maxpwm <0-255>
-ramp <0-255>
-watchdog on
-watchdog off
-timeout <50-5000>
-testmotor <motor> <start> <end> <step>
+Run in a second terminal after `bringup_ninja_overhead_drive.sh`.
 
-Eksempel:
-
-trim 0 -5
-minpwm 50
-maxpwm 120
-ramp 10
-timeout 300
-testmotor 1 30 120 10
-testmotor 2 30 120 10
+```bash
+ros2 launch ninja_bot_control ninja_crate_align_only.launch.py
 ```
 
-```Motors
+### Arm / disarm drive
 
-forward
-backward
-left
-right
-reverseleft
-reverseright
-stop
+```bash
+ros2 topic pub --once /ninja/enable_drive std_msgs/Bool "{data: true}"
+ros2 topic pub --once /ninja/enable_drive std_msgs/Bool "{data: false}"
+```
+
+---
+
+## ESP32 commands
+
+### Motors
+```
+forward    backward    left    right    stop
 m1 <-255 to 255>
 m2 <-255 to 255>
 motors <left> <right>
-
-Eksempel: 
-m1 60
-m1 0
-m2 60
-m2 0
-motors 80 80
-motors -80 -80
-motors -80 80
-motors 80 -80
-stop
 ```
 
-```Gripper / tilt
-
-startposition
-neutralposition
-eating
-stopeating
-twocrates
-onecrate
-tiltup
-tiltdown
-release
-tilt <0-180>
-grip <0-180>
+### Motor tuning
+```
+trim <left_trim> <right_trim>
+minpwm <0-255>    maxpwm <0-255>    ramp <0-255>
+watchdog on/off    timeout <50-5000>
+testmotor <motor> <start> <end> <step>
 ```
 
-```VLX sensors
+### Gripper and tilt
+```
+tiltup    tiltdown    tilt <0-180>
+grip <0-180>    twocrates    onecrate    release
+startposition    neutralposition    eating    stopeating
+```
 
-vlx         - vlx toggles continuous VLX streaming on/off.
+### Sensors
+```
+vlx             toggles VLX distance sensor stream
 vlxstatus
-```
-
-```Voltage
-
 voltage
-voltagestream   - voltagestream toggles continuous voltage streaming on/off.
+voltagestream   toggles voltage stream
 ```
 
+---
 
+## ROS checks
 
-## ROS2 cmd_vel Test
-
-Forward:
-
-`ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}, angular: {z: 0.0}}" --rate 10`
-
-Turn:
-
-`ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.5}}" --rate 10`
-
-Stop:
-
-`ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.0}}"`
-
-
-## Useful ROS2 Checks
-
-`ros2 node list`  
-List running nodes.
-
-`ros2 topic list`  
-List topics.
-
-`ros2 node info /esp32_bridge`  
-Check bridge publishers/subscribers.
-
-`ros2 topic info /ninja/esp32_cmd`  
-Check command topic.
-
-
-
-## Code Dependency Reminder
-
-Arduino owns hardware: motors, pins, servos, sensors.  
-`esp32_bridge.py` owns USB serial and converts `/cmd_vel` to `motors left right`.  
-`ninja_cmd_terminal.py` only forwards typed commands to `/ninja/esp32_cmd`.
-
-Change only Arduino internals = upload Arduino only.  
-Change Arduino command names like `motors` or `stop` = update Arduino and `esp32_bridge.py`.  
-Change Python files = run `colcon build --packages-select ninja_bot_control` and `source install/setup.bash`.
-
-
-## Terminal Shortcuts
-
-`Ctrl + C` stop running program.  
-`Ctrl + L` clear terminal.  
-`Ctrl + A` start of line.  
-`Ctrl + E` end of line.  
-`Ctrl + U` delete before cursor.  
-`Ctrl + K` delete after cursor.  
-`Ctrl + W` delete previous word.  
-`Ctrl + R` search command history.  
-`Ctrl + Shift + T` new terminal tab.  
-`Ctrl + Shift + C` copy.  
-`Ctrl + Shift + V` paste.  
-`Super + Left/Right` snap window left/right.
+```bash
+ros2 topic hz /ninja/pose
+ros2 topic echo /ninja/telemetry
+ros2 topic pub --once /ninja/esp32_cmd std_msgs/msg/String "{data: 'ping'}"
+```

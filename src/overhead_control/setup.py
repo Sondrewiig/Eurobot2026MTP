@@ -31,14 +31,10 @@ setup(
     entry_points={
         'console_scripts': [
             'overhead_camera_node = overhead_control.overhead_camera_node:main',
-            'overhead_viewer_node = overhead_control.overhead_viewer_node:main',
             'ninja_pose_from_overhead = overhead_control.ninja_pose_from_overhead:main',
             'main_bot_pose_from_overhead = overhead_control.main_bot_pose_from_overhead:main',
             'enemy_pose_from_overhead = overhead_control.enemy_pose_from_overhead:main',
             'operator_gui = overhead_control.operator_gui:main',
-            'position_verifier = overhead_control.position_verifier_node:main',
-            'fake_ninja = overhead_control.fake_ninja:main',
-            'overhead_rectifier_node = overhead_control.overhead_rectifier_node:main',
         ],
     },
 )
